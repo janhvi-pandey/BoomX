@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import {
   FaPlay,
   FaUserPlus,
@@ -14,6 +12,7 @@ import {
   MdOutlineEdit,
   MdOutlineOndemandVideo,
 } from "react-icons/md";
+import Toast from "../reusable/Toast";
 
 const FloatingIcon = ({ Icon, style }) => (
   <Icon
@@ -24,7 +23,15 @@ const FloatingIcon = ({ Icon, style }) => (
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [toast, setToast] = useState({ message: "", visible: false, type: "" });
   const navigate = useNavigate();
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, visible: true, type });
+    setTimeout(() => {
+      setToast({ message: "", visible: false, type: "" });
+    }, 2000);
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -45,27 +52,26 @@ const Login = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || "Login failed");
+        showToast(data.message || "Login failed", "error");
         return;
       }
 
       localStorage.setItem("token", data.token);
 
-      toast.success("Login successful! Redirecting...");
+      showToast("Login successful! Redirecting...");
       setForm({ email: "", password: "" });
 
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
     } catch (error) {
-      toast.error("Something went wrong. Please try again.");
       console.error("Login error:", error);
+      showToast("Something went wrong. Please try again.", "error");
     }
   };
-
   return (
     <>
-      <ToastContainer position="top-right" autoClose={2000} />
+      <Toast message={toast.message} type={toast.type} visible={toast.visible} />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 px-4 relative overflow-hidden">
         {/* Floating Icons */}
         <div className="absolute inset-0 z-0">
