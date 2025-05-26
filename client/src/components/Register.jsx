@@ -11,7 +11,7 @@ import {
   MdOutlineEdit,
   MdOutlineOndemandVideo,
 } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const FloatingIcon = ({ Icon, style }) => (
   <Icon
@@ -22,14 +22,37 @@ const FloatingIcon = ({ Icon, style }) => (
 
 const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    alert("Register clicked");
+
+    try {
+      const response = await fetch("http://localhost:5000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.message || "Registration failed");
+        return;
+      }
+      setForm({ name: "", email: "", password: "" });
+
+      navigate("/login");
+    } catch (error) {
+      alert("Something went wrong. Please try again later.");
+      console.error("Registration error:", error);
+    }
   };
 
   return (
