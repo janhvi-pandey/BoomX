@@ -20,20 +20,21 @@ const FloatingIcon = ({ Icon, style }) => (
   />
 );
 
-const Register = () => {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+const Login = () => {
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleRegister = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    alert("Register clicked");
+    alert("Login clicked");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 px-4 relative overflow-hidden">
+      {/* Floating Icons */}
       <div className="absolute inset-0 z-0">
         <FloatingIcon
           Icon={FaPlay}
@@ -119,28 +120,19 @@ const Register = () => {
       <div className="relative z-10 w-[88%] max-w-3xl bg-white bg-opacity-90 backdrop-blur-md rounded-xl shadow-xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Content */}
         <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center bg-gradient-to-br from-[#9d3a75] via-[#7b1c8f] to-[#4d004d] text-white">
-          <h2 className="lg:text-4xl text-2xl font-extrabold mb-2 text-center md:text-left">
-            Welcome to <span className="text-pink-300">BoomX</span>
+          <h2 className="lg:text-3xl text-2xl font-extrabold mb-3 text-center md:text-left">
+            Glad you’re back, <span className="text-pink-300">BoomX</span>{" "}
+            creator!
           </h2>
           <p className="hidden md:block text-sm font-medium max-w-sm leading-snug opacity-90">
-            Start your journey in a vibrant space where creators connect,
-            stream, and thrive together.
+            Log in to pick up where you left off and keep creating amazing
+            content.
           </p>
         </div>
 
         {/* Right Form */}
-        <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
-          <form onSubmit={handleRegister} className="space-y-4 md:space-y-5">
-            <input
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 rounded-lg border border-purple-700 bg-purple-50 placeholder-gray-600 text-purple-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-700 focus:ring-opacity-50 transition"
-              autoComplete="name"
-            />
+        <div className="md:w-1/2 w-full max-w-md mx-auto p-6 sm:p-8 flex flex-col justify-center">
+          <form onSubmit={handleLogin} className="space-y-4 md:space-y-5">
             <input
               type="email"
               name="email"
@@ -159,24 +151,24 @@ const Register = () => {
               onChange={handleChange}
               required
               className="w-full px-4 py-2 rounded-lg border border-purple-700 bg-purple-50 placeholder-gray-600 text-purple-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-700 focus:ring-opacity-50 transition"
-              autoComplete="new-password"
+              autoComplete="current-password"
             />
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-[#9d3a75] via-[#7b1c8f] to-[#4d004d] hover:from-[#7b1c8f] hover:via-[#6a0070] hover:to-[#3d003d] text-white font-bold py-2 rounded-lg"
+              className="w-full bg-gradient-to-r from-[#9d3a75] via-[#7b1c8f] to-[#4d004d] hover:from-[#7b1c8f] hover:via-[#6a0070] hover:to-[#3d003d] text-white font-bold py-2 rounded-lg "
             >
-              Register
+              Login
             </button>
           </form>
 
           <p className="mt-4 text-center text-sm text-black font-medium">
-            Already a member?{" "}
+            Don&apos;t have an account?{" "}
             <Link
-              to="/login"
+              to="/register"
               className="text-pink-600 hover:text-pink-900 font-semibold"
             >
-              Login here
+              Register here
             </Link>
           </p>
         </div>
@@ -192,4 +184,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Login;
