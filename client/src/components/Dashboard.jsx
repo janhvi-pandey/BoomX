@@ -12,7 +12,7 @@ const Dashboard = () => {
     <div className="h-screen flex flex-col text-purple-900">
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar for large screens */}
-        <div className="hidden md:block w-64 bg-white bg-opacity-70 backdrop-blur-md border-r border-pink-400 shadow-md">
+        <div className="hidden md:block w-72 bg-white bg-opacity-70 backdrop-blur-md border-r border-pink-400 shadow-md">
           <Sidebar />
         </div>
 
