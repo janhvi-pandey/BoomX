@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaCloudArrowUp } from "react-icons/fa6";
 import useVideo from '../context/video';
+import Toast from "../reusable/Toast";
 
 const Upload = () => {
   const [title, setTitle] = useState('');
@@ -8,13 +9,21 @@ const Upload = () => {
   const [type, setType] = useState('short');
   const [file, setFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
-
   const [price, setPrice] = useState('');
   const [thumbnail, setThumbnail] = useState(null);
   const [videoURL, setVideoURL] = useState('');
   const [uploading, setUploading] = useState(false);
 
+  const [toast, setToast] = useState({ message: "", visible: false, type: "" });
+
   const { uploadVideo } = useVideo();
+
+  const showToast = (message, type = "success") => {
+    setToast({ message, visible: true, type });
+    setTimeout(() => {
+      setToast({ message: "", visible: false, type: "" });
+    }, 2000);
+  };
 
   const handleFileDrop = (e) => {
     e.preventDefault();
@@ -27,7 +36,6 @@ const Upload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
 
     try {
       const formData = new FormData();
@@ -47,7 +55,7 @@ const Upload = () => {
       setUploading(true);
       const result = await uploadVideo(formData);
 
-      alert('Video uploaded successfully!');
+      showToast('Video uploaded successfully!');
       setTitle('');
       setDescription('');
       setType('short');
@@ -56,21 +64,24 @@ const Upload = () => {
       setThumbnail(null);
       setVideoURL('');
     } catch (error) {
-      alert('Upload failed: ' + error.message);
+      showToast('Upload failed: ' + error.message, 'error');
     } finally {
       setUploading(false);
     }
   };
 
-  return (<>
-   <div className="text-center lg:text-start lg:ml-4 mt-9 mb-8">
-      <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
-        Upload Your Creation
-      </h1>
-      <p className="text-lg font-medium text-gray-700 mt-1">
-        Share your stories, shorts, or full-length features with the BoomX community.
-      </p>
-    </div> <div className="w-full flex items-center justify-center px-4">
+  return (
+    <>
+      <Toast message={toast.message} type={toast.type} visible={toast.visible} />
+      <div className="text-center lg:text-start lg:ml-4 mt-9 mb-8">
+        <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
+          Upload Your Creation
+        </h1>
+        <p className="text-lg font-medium text-gray-700 mt-1">
+          Share your stories, shorts, or full-length features with the BoomX community.
+        </p>
+      </div>
+     <div className="w-full flex items-center justify-center px-4">
       <div className="w-full max-w-lg bg-white/70 backdrop-blur-lg shadow-xl rounded-xl lg:p-4 p-5 text-gray-700 border border-black">
         
 
