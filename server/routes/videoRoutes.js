@@ -51,16 +51,5 @@ router.post("/upload", uploadFields, verifyToken, async (req, res) => {
   }
 });
 
-router.get("/feed", verifyToken, async (req, res) => {
-  try {
-    const videos = await Video.find()
-      .populate("creator", "username") // Assuming your User model has a username
-      .sort({ createdAt: -1 });
-
-    res.status(200).json(videos);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 module.exports = router;
