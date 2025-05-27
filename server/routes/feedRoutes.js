@@ -4,30 +4,34 @@ const verifyToken = require("../middleware/verifyToken");
 const Video = require("../models/Video");
 const User = require("../models/User");
 
-
+// GET /api/feed/videos
 router.get("/videos", verifyToken, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
   try {
+    // Fetch current user's purchased videos
     const user = await User.findById(req.user.id).select("purchasedVideos");
 
+    // Fetch videos with creator name populated
     const videos = await Video.find()
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("creator", "name") 
-      .lean();
+      .populate("creator", "name")
+      .lean(); // lean returns plain JS objects (not Mongoose documents)
 
     const feed = videos.map((video) => {
-      const isPurchased = user.purchasedVideos.some(
+      const isPurchased = user?.purchasedVideos?.some(
         (v) => v.toString() === video._id.toString()
       );
 
       return {
         _id: video._id,
         title: video.title,
+        description: video.description,
+        comments: video.comments || [],
         creatorName: video.creator?.name || "Unknown",
         videoType: video.videoType,
         videoUrl: video.videoUrl,

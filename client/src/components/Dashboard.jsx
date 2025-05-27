@@ -17,7 +17,7 @@ const Dashboard = () => {
 
         {/* Main content with scrollable area */}
         <main className="flex-1 overflow-y-auto max-h-screen p-4">
-          <div className="w-full max-w-6xl mx-auto">
+          <div className="w-full mx-auto">
             <Routes>
               <Route index element={<Feed />} />
               <Route path="feed" element={<Feed />} />
