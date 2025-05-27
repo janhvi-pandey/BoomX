@@ -1,4 +1,6 @@
 import React from "react";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {
   FaPlay,
@@ -22,6 +24,13 @@ const FloatingIcon = ({ Icon, style }) => (
 );
 
 const LandingPage = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/" && localStorage.getItem("token")) {
+      localStorage.removeItem("token");
+    }
+  }, [location.pathname]);
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 flex items-center justify-center px-6 sm:px-12 overflow-hidden">
       {/* Background Icons */}

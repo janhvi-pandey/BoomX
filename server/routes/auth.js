@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const verifyToken = require("../middleware/verifyToken");
+
 
 // Register route
 router.post("/register", async (req, res) => {
@@ -64,11 +66,11 @@ router.post("/login", async (req, res) => {
 });
 
 
-// // Get profile
-// router.get('/profile', protect, async (req, res) => {
-//   const user = await User.findById(req.user.id).select('-password');
-//   res.json(user);
-// });
+// Get profile
+router.get('/profile', verifyToken, async (req, res) => {
+  const user = await User.findById(req.user.id).select('-password');
+  res.json(user);
+});
 
 
 module.exports = router;
