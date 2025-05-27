@@ -7,25 +7,20 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import { VideoProvider } from "./context/video";
 import { VideoFeedProvider } from "./context/VideoFeedContext";
+import VideoPage from "./components/VideoPage";
 
 function App() {
   return (
     <Router>
       <VideoProvider>
-        <Routes>
-      
-          <Route
-            path="/dashboard/*"
-            element={
-              <VideoFeedProvider>
-                <Dashboard />
-              </VideoFeedProvider>
-            }
-          />
+        <VideoFeedProvider><Routes>
+          <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="/" element={<LandingPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-        </Routes>
+          <Route path="/video/:id" element={<VideoPage />} />
+        </Routes></VideoFeedProvider>
+        
       </VideoProvider>
     </Router>
   );
