@@ -52,5 +52,55 @@ console.log(red)
   }
 });
 
+// Get a specific video by ID (with comments)
+router.get("/:id", verifyToken, async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id).populate("creator", "name");
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    res.json({
+      _id: video._id,
+      title: video.title,
+      description: video.description,
+      videoType: video.videoType,
+      videoUrl: video.videoUrl,
+      thumbnail: video.thumbnail,
+      isPaid: video.isPaid,
+      price: video.price,
+      createdAt: video.createdAt,
+      comments: video.comments,
+      creatorName: video.creator?.name || "Unknown",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add a comment to a video
+router.post("/:id/comments", verifyToken, async (req, res) => {
+  try {
+    const { content } = req.body;
+    if (!content || content.trim() === "") {
+      return res.status(400).json({ message: "Comment content is required" });
+    }
+
+    const video = await Video.findById(req.params.id);
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    // Add new comment
+    video.comments.push({
+      username: req.user.name || "Anonymous",
+      content: content.trim(),
+      createdAt: new Date(),
+    });
+
+    await video.save();
+
+    res.status(201).json({ message: "Comment added", comments: video.comments });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 module.exports = router;
