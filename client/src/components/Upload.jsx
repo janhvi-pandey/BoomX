@@ -1,90 +1,118 @@
 import React, { useState } from 'react';
+import { FaCloudArrowUp } from "react-icons/fa6";
 
 const Upload = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('short');
   const [file, setFile] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile && droppedFile.type === 'video/mp4') {
+      setFile(droppedFile);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     alert(`Uploading ${type} video titled "${title}"`);
-   
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white bg-opacity-10 backdrop-blur-md rounded-xl p-6 sm:p-10 shadow-xl mt-6 text-white">
-      <h2 className="text-3xl font-extrabold text-center mb-8 text-pink-300">
-        Upload Your <span className="text-white">BoomX</span> Creation
-      </h2>
+    <div className="w-full flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
+      <div className="w-full max-w-lg bg-white/70 backdrop-blur-lg shadow-xl rounded-xl lg:p-4 p-5 text-gray-700 border border-black">
+        <h2 className="text-xl sm:text-2xl font-bold text-center text-black mb-3">
+          Upload Your <span className="text-fuchsia-700 font-extrabold">BoomX</span> Creation
+        </h2>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        <label className="flex flex-col gap-1 text-sm font-semibold">
-          Title
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Video title"
-            required
-            className="rounded-md p-3 bg-purple-50 text-purple-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
-          />
-        </label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+          <label className="text-sm font-semibold">
+            Title
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Video title"
+              required
+              className="mt-1 w-full rounded-md p-2 bg-purple-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-400"
+            />
+          </label>
 
-        <label className="flex flex-col gap-1 text-sm font-semibold">
-          Description
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Video description"
-            rows={4}
-            className="rounded-md p-3 bg-purple-50 text-purple-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
-          />
-        </label>
+          <label className="text-sm font-semibold">
+            Description
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Short description"
+              rows={1}
+              className="mt-1 w-full text-sm sm:text-base rounded-md p-2 bg-purple-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none"
+            />
+          </label>
 
-        <label className="flex flex-col gap-1 text-sm font-semibold">
-          Type
-          <select
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="rounded-md p-3 bg-purple-50 text-purple-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
+          <label className="text-sm font-semibold">
+            Type
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="mt-1 w-full rounded-md p-2 bg-purple-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-400"
+            >
+              <option value="short">Short</option>
+              <option value="long">Long</option>
+            </select>
+          </label>
+
+          {type === 'short' ? (
+            <div
+              onDrop={handleFileDrop}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              className={`mt-2 border-2 border-gray-500 rounded-md p-4 text-center cursor-pointer flex flex-col items-center justify-center gap-1  transition-colors ${
+                dragOver ? 'bg-pink-100/50' : 'bg-white/60'
+              }`}
+            >
+              <FaCloudArrowUp className="text-fuchsia-700 text-3xl sm:text-4xl" />
+              <p className="text-xs sm:text-sm font-medium text-black select-none">
+                {file ? `File: ${file.name}` : 'Drag and drop your MP4 file here, or click to select'}
+              </p>
+              <input
+                type="file"
+                accept="video/mp4"
+                onChange={(e) => setFile(e.target.files[0])}
+                className="hidden"
+                id="fileInput"
+              />
+              <label htmlFor="fileInput" className="cursor-pointer font-semibold text-fuchsia-900 text-sm sm:text-base select-none">
+                Browse files
+              </label>
+            </div>
+          ) : (
+            <label className="text-sm font-semibold">
+              Video URL
+              <input
+                type="url"
+                placeholder="https://example.com/video"
+                onChange={(e) => setFile(e.target.value)}
+                required
+                className="mt-1 w-full rounded-md p-2 bg-purple-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-400"
+              />
+            </label>
+          )}
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-[#9d3a75] via-[#7b1c8f] to-[#4d004d] hover:from-[#7b1c8f] hover:via-[#6a0070] hover:to-[#3d003d] text-white font-bold py-2 rounded-lg transition-all duration-300 mt-3"
           >
-            <option value="short">Short</option>
-            <option value="long">Long</option>
-          </select>
-        </label>
-
-        {type === 'short' ? (
-          <label className="flex flex-col gap-1 text-sm font-semibold">
-            Upload MP4 file
-            <input
-              type="file"
-              accept="video/mp4"
-              onChange={(e) => setFile(e.target.files[0])}
-              required
-              className="text-pink-100"
-            />
-          </label>
-        ) : (
-          <label className="flex flex-col gap-1 text-sm font-semibold">
-            Video URL
-            <input
-              type="url"
-              placeholder="Enter video URL"
-              onChange={(e) => setFile(e.target.value)}
-              required
-              className="rounded-md p-3 bg-purple-50 text-purple-900 focus:outline-none focus:ring-2 focus:ring-pink-500"
-            />
-          </label>
-        )}
-
-        <button
-          type="submit"
-          className="bg-gradient-to-r from-[#9d3a75] via-[#7b1c8f] to-[#4d004d] hover:from-[#7b1c8f] hover:via-[#6a0070] hover:to-[#3d003d] text-white font-bold py-3 rounded-lg transition-all duration-300"
-        >
-          Upload
-        </button>
-      </form>
+            Upload
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
