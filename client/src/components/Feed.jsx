@@ -62,9 +62,14 @@ const Feed = () => {
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
       
-      <h1 className="text-4xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#843264] to-[#5c136a]">
+      <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
         Boom Video Feed
       </h1>
+      <p className="text-lg font-medium text-gray-700 mb-10">
+  From quick laughs to deep dives — your next favorite video is right here.
+</p>
+
+
       <div className="space-y-10">
         {uniqueFeed.length === 0 && !loading && (
           <p className="text-center">No videos available.</p>

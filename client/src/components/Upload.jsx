@@ -46,7 +46,7 @@ const Upload = () => {
 
       setUploading(true);
       const result = await uploadVideo(formData);
-console.log(result);
+
       alert('Video uploaded successfully!');
       setTitle('');
       setDescription('');
@@ -62,12 +62,17 @@ console.log(result);
     }
   };
 
-  return (
-<div className="w-full flex items-center justify-center min-h-screen px-4">
+  return (<>
+   <div className="text-center lg:text-start lg:ml-4 mt-9 mb-8">
+      <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
+        Upload Your Creation
+      </h1>
+      <p className="text-lg font-medium text-gray-700 mt-1">
+        Share your stories, shorts, or full-length features with the BoomX community.
+      </p>
+    </div> <div className="w-full flex items-center justify-center px-4">
       <div className="w-full max-w-lg bg-white/70 backdrop-blur-lg shadow-xl rounded-xl lg:p-4 p-5 text-gray-700 border border-black">
-        <h2 className="text-xl sm:text-2xl font-bold text-center text-black mb-3">
-          Upload Your <span className="text-fuchsia-700 font-extrabold">BoomX</span> Creation
-        </h2>
+        
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
           <label className="text-sm font-semibold">
@@ -196,7 +201,8 @@ console.log(result);
           </button>
         </form>
       </div>
-    </div>
+    </div></>
+   
   );
 };
 

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
 const VideoFeedContext = createContext(null);
 
@@ -14,11 +20,14 @@ export const VideoFeedProvider = ({ children }) => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5000/api/feed/videos?page=${page}&limit=10`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `http://localhost:5000/api/feed/videos?page=${page}&limit=10`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await res.json();
-console.log(data)
+      // console.log(data)
       if (res.ok) {
         setFeed((prev) => [...prev, ...data.feed]);
         if (data.feed.length < 10) setHasMore(false);
