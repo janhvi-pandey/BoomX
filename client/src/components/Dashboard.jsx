@@ -1,11 +1,9 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import Feed from '../components/Feed';
-import Upload from '../components/Upload';
-import Shorts from '../components/Shorts';
-import BottomNav from '../components/BottomNav';
-import LandingPage from './LandingPage';
+import { Routes, Route } from "react-router-dom";
+import Sidebar from "../components/Sidebar";
+import Feed from "../components/Feed";
+import Upload from "../components/Upload";
+import Shorts from "../components/Shorts";
+import BottomNav from "../components/BottomNav";
 
 const Dashboard = () => {
   return (
@@ -20,7 +18,8 @@ const Dashboard = () => {
         <main className="flex-1 p-4 flex justify-center items-center min-h-[calc(100vh-4rem)]">
           <div className="w-[95%]   ">
             <Routes>
-              <Route path="/" element={<LandingPage />} />
+              {/* Default route shows Feed */}
+              <Route index element={<Feed />} />
               <Route path="feed" element={<Feed />} />
               <Route path="upload" element={<Upload />} />
               <Route path="shorts" element={<Shorts />} />

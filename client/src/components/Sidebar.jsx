@@ -47,9 +47,9 @@ const Sidebar = () => {
 
   const navItems = [
     { to: "/", icon: <FaHome />, label: "Home" },
-    { to: "/feed", icon: <BiSolidVideos />, label: "Feed" },
-    { to: "/shorts", icon: <SiYoutubeshorts />, label: "Shorts" },
-    { to: "/upload", icon: <FaCloudArrowUp />, label: "Upload" },
+    { to: "/dashboard/feed", icon: <BiSolidVideos />, label: "Feed" },
+    { to: "/dashboard/shorts", icon: <SiYoutubeshorts />, label: "Shorts" },
+    { to: "/dashboard/upload", icon: <FaCloudArrowUp />, label: "Upload" },
   ];
 
   return (
