@@ -1,32 +1,55 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const videoSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  description: String,
-  type: {
-    type: String,
-    enum: ['short', 'long'],
-    required: true,
-  },
-  shortVideoPath: {
-    type: String, 
-  },
-  longVideoUrl: {
-    type: String, 
-  },
-  price: {
-    type: Number, 
-    default: 0,
-  },
   creator: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
+    ref: "User",
   },
-}, { timestamps: true });
+  title: {
+    type: String,
+  },
+  description: {
+    type: String,
+  },
+  videoType: {
+    type: String,
+    enum: ["short", "long"],
+  },
+  videoUrl: {
+    type: String,
+  },
+  thumbnail: {
+    type: String,
+  },
+  isPaid: {
+    type: Boolean,
+    default: false,
+  },
+  price: {
+    type: Number,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  comments: [
+    {
+      username: {
+        type: String,
+        required: true,
+      },
+      content: {
+        type: String,
+        required: true,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
+});
 
-module.exports = mongoose.model('Video', videoSchema);
+const Video = mongoose.models.Video || mongoose.model("Video", videoSchema);
+
+module.exports = Video;

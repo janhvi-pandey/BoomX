@@ -17,7 +17,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/videos', videoRoutes);
+app.use("/api/videos", videoRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
