@@ -4,7 +4,7 @@ const verifyToken = require("../middleware/verifyToken");
 const Video = require("../models/Video");
 const User = require("../models/User");
 
-// GET /api/feed?page=1&limit=10
+
 router.get("/videos", verifyToken, async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -17,7 +17,7 @@ router.get("/videos", verifyToken, async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
-      .populate("creator", "name") // Assumes creator has a "name" field
+      .populate("creator", "name") 
       .lean();
 
     const feed = videos.map((video) => {
