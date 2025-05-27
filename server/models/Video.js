@@ -12,10 +12,10 @@ const videoSchema = new mongoose.Schema({
     enum: ['short', 'long'],
     required: true,
   },
-  videoPath: {
+  shortVideoPath: {
     type: String, 
   },
-  videoUrl: {
+  longVideoUrl: {
     type: String, 
   },
   price: {
