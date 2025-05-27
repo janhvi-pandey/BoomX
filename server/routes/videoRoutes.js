@@ -5,6 +5,7 @@ const verifyToken = require("../middleware/verifyToken");
 const Video = require("../models/Video");
 const uploadToS3 = require("../services/awsUploader");
 const fs = require("fs");
+const User = require("../models/User"); 
 
 const uploadFields = upload.fields([
   { name: "videoFile", maxCount: 1 },
@@ -76,31 +77,53 @@ router.get("/:id", verifyToken, async (req, res) => {
   }
 });
 
-// Add a comment to a video
+// Add comment to a video
+
 router.post("/:id/comments", verifyToken, async (req, res) => {
   try {
+    const videoId = req.params.id;
     const { content } = req.body;
-    if (!content || content.trim() === "") {
-      return res.status(400).json({ message: "Comment content is required" });
+    const userId = req.user?.id; // get user ID from token payload
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized, user ID missing" });
     }
 
-    const video = await Video.findById(req.params.id);
-    if (!video) return res.status(404).json({ message: "Video not found" });
+    if (!content) {
+      return res.status(400).json({ message: "Content is required" });
+    }
 
-    // Add new comment
-    video.comments.push({
-      username: req.user.name || "Anonymous",
-      content: content.trim(),
+    // Find user to get their name
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find video to add comment
+    const video = await Video.findById(videoId);
+    if (!video) {
+      return res.status(404).json({ message: "Video not found" });
+    }
+
+    const newComment = {
+      username: user.name,  // use fetched user name
+      content,
       createdAt: new Date(),
-    });
+    };
 
+    video.comments.push(newComment);
     await video.save();
 
-    res.status(201).json({ message: "Comment added", comments: video.comments });
+    res.status(201).json({
+      message: "Comment added",
+      comments: video.comments,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Add comment error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 module.exports = router;

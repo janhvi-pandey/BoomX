@@ -1,42 +1,81 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { useVideoFeed } from "../context/VideoFeedContext";
+import useVideo from "../context/video"; // your VideoContext hook
 import Sidebar from "../components/Sidebar";
 import BottomNav from "../components/BottomNav";
 
 const VideoPage = () => {
   const { id } = useParams();
-  const { feed } = useVideoFeed();
-  const video = feed.find((v) => v._id === id);
-  const videoRef = useRef(null);
+  const { getVideoById, addComment } = useVideo();
 
+  const videoRef = useRef(null);
+  const [video, setVideo] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [user, setUser] = useState({ name: "Anonymous" });
+  const [user, setUser] = useState({ name: "Anonymous" }); // optional, can be used elsewhere
 
+  // Optional: Fetch user profile (if you want to use elsewhere, but not required for comment username)
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       fetch("http://localhost:5000/api/auth/profile", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
         .then((data) => {
           if (data?.name) setUser({ name: data.name });
         })
-        .catch((err) => {
-          console.error("Failed to fetch user profile:", err.message);
-        });
+        .catch((err) => console.error("Failed to fetch profile:", err));
     }
   }, []);
 
+  // Fetch video and its comments whenever `id` changes
   useEffect(() => {
-    setComments([]);
-    setNewComment("");
-  }, [id]);
+    if (!id) return;
+
+    getVideoById(id)
+      .then((data) => {
+        if (!data || data.message) {
+          console.error("Failed to fetch video:", data?.message);
+          setVideo(null);
+          setComments([]);
+          return;
+        }
+        setVideo(data);
+        setComments(data.comments || []);
+      })
+      .catch((err) => {
+        console.error("Error loading video:", err);
+      });
+  }, [id, getVideoById]);
+
+  // Video control handlers
+  const playVideo = () => videoRef.current?.play();
+  const pauseVideo = () => videoRef.current?.pause();
+  const forwardVideo = () => {
+    if (videoRef.current) videoRef.current.currentTime += 10;
+  };
+  const backwardVideo = () => {
+    if (videoRef.current) videoRef.current.currentTime -= 10;
+  };
+
+  // Handler to add comment: sends content only; backend adds username from token
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    try {
+      const result = await addComment(id, newComment.trim());
+      if (result?.comments) {
+        setComments(result.comments);
+        setNewComment("");
+      } else {
+        console.error("Failed to add comment");
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
 
   if (!video) {
     return (
@@ -45,25 +84,6 @@ const VideoPage = () => {
       </div>
     );
   }
-
-  const playVideo = () => videoRef.current?.play();
-  const pauseVideo = () => videoRef.current?.pause();
-  const forwardVideo = () => (videoRef.current.currentTime += 10);
-  const backwardVideo = () => (videoRef.current.currentTime -= 10);
-
-  const addComment = (e) => {
-    e.preventDefault();
-    if (!newComment.trim()) return;
-
-    const timestamp = new Date().toLocaleString();
-    const newEntry = {
-      text: newComment.trim(),
-      user: user.name,
-      time: timestamp,
-    };
-    setComments((prev) => [...prev, newEntry]);
-    setNewComment("");
-  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -78,16 +98,15 @@ const VideoPage = () => {
       </div>
 
       {/* Main content */}
-      <main className="flex-1 p-6 space-y-6 ">
+      <main className="flex-1 p-6 space-y-6">
+        <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
+          Boom Video: {video.title}
+        </h1>
+        <p className="text-lg font-medium text-gray-700 mb-10">
+          Get ready to dive in — turn up the volume, enjoy the ride & let us know
+          what you think!
+        </p>
 
-     <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
-  Boom Video: {video.title}
-</h1>
-<p className="text-lg font-medium text-gray-700 mb-10">
-Get ready to dive in — turn up the volume, enjoy the ride & let us know what you think!</p>
-        <h1 className="text-3xl font-bold text-gray-900">{video.title}</h1>
-
-        {/* Video */}
         <video
           ref={videoRef}
           src={video.videoUrl}
@@ -97,17 +116,27 @@ Get ready to dive in — turn up the volume, enjoy the ride & let us know what y
 
         {/* Video Controls */}
         <div className="flex justify-center space-x-4">
-          <button onClick={backwardVideo} className="video-btn">⏪ 10s</button>
-          <button onClick={playVideo} className="video-btn">▶️ Play</button>
-          <button onClick={pauseVideo} className="video-btn">⏸ Pause</button>
-          <button onClick={forwardVideo} className="video-btn">10s ⏩</button>
+          <button onClick={backwardVideo} className="video-btn">
+            ⏪ 10s
+          </button>
+          <button onClick={playVideo} className="video-btn">
+            ▶️ Play
+          </button>
+          <button onClick={pauseVideo} className="video-btn">
+            ⏸ Pause
+          </button>
+          <button onClick={forwardVideo} className="video-btn">
+            10s ⏩
+          </button>
         </div>
 
         {/* Comments Section */}
         <section>
-          <h2 className="text-2xl font-semibold mb-4 mt-8 text-gray-900">Comments</h2>
+          <h2 className="text-2xl font-semibold mb-4 mt-8 text-gray-900">
+            Comments
+          </h2>
 
-          <form onSubmit={addComment} className="flex gap-2 mb-6">
+          <form onSubmit={handleAddComment} className="flex gap-2 mb-6">
             <input
               type="text"
               value={newComment}
@@ -127,15 +156,16 @@ Get ready to dive in — turn up the volume, enjoy the ride & let us know what y
             <p className="text-gray-500 italic">No comments yet. Be the first!</p>
           ) : (
             <ul className="space-y-3 max-h-80 overflow-y-auto pr-2">
-              {comments.map((comment, idx) => (
+              {comments.map((comment) => (
                 <li
-                  key={idx}
+                  key={comment._id}
                   className="border border-gray-300 rounded p-3 bg-white break-words shadow-sm"
                 >
                   <div className="text-sm text-gray-500 mb-1">
-                    {comment.user} • {comment.time}
+                    {comment.username} •{" "}
+                    {new Date(comment.createdAt).toLocaleString()}
                   </div>
-                  <div className="text-gray-800">{comment.text}</div>
+                  <div className="text-gray-800">{comment.content}</div>
                 </li>
               ))}
             </ul>
