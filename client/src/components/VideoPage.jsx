@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import useVideo from "../context/video"; // your VideoContext hook
+import useVideo from "../context/video"; 
 import Sidebar from "../components/Sidebar";
 import BottomNav from "../components/BottomNav";
 
@@ -12,9 +12,9 @@ const VideoPage = () => {
   const [video, setVideo] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  const [user, setUser] = useState({ name: "Anonymous" }); // optional, can be used elsewhere
+  const [user, setUser] = useState({ name: "Anonymous" });
 
-  // Optional: Fetch user profile (if you want to use elsewhere, but not required for comment username)
+ 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -59,7 +59,7 @@ const VideoPage = () => {
     if (videoRef.current) videoRef.current.currentTime -= 10;
   };
 
-  // Handler to add comment: sends content only; backend adds username from token
+  
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;

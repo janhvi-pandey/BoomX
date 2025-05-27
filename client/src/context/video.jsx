@@ -5,7 +5,7 @@ const VideoContext = createContext(null);
 export const VideoProvider = ({ children }) => {
   const serverUrl = "http://localhost:5000";
 
-  // Upload video function (existing)
+  // Upload video function
   const uploadVideo = async (videoData) => {
     try {
       const token = localStorage.getItem("token");
@@ -47,14 +47,17 @@ export const VideoProvider = ({ children }) => {
   const addComment = async (videoId, commentContent) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${serverUrl}/api/videos/${videoId}/comments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ content: commentContent }),
-      });
+      const response = await fetch(
+        `${serverUrl}/api/videos/${videoId}/comments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content: commentContent }),
+        }
+      );
 
       const data = await response.json();
       console.log(data);
