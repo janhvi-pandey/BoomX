@@ -7,18 +7,18 @@ import BottomNav from "../components/BottomNav";
 
 const Dashboard = () => {
   return (
-    <div className="h-screen flex flex-col text-purple-900">
+    <div className="h-screen max-h-screen flex flex-col overflow-hidden text-purple-900">
+      {/* Main layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar for large screens */}
-        <div className="hidden md:block w-72 bg-white bg-opacity-70 backdrop-blur-md border-r border-pink-400 shadow-md">
+        {/* Sidebar */}
+        <div className="hidden max-h-screen md:block w-72 bg-white bg-opacity-70 backdrop-blur-md border-r border-pink-400 shadow-md">
           <Sidebar />
         </div>
 
-        {/* Main content area */}
-        <main className="flex-1 p-4 flex justify-center items-center min-h-[calc(100vh-4rem)]">
-          <div className="w-[95%]   ">
+        {/* Main content with scrollable area */}
+        <main className="flex-1 overflow-y-auto max-h-screen p-4">
+          <div className="w-full max-w-6xl mx-auto">
             <Routes>
-              {/* Default route shows Feed */}
               <Route index element={<Feed />} />
               <Route path="feed" element={<Feed />} />
               <Route path="upload" element={<Upload />} />
@@ -28,7 +28,7 @@ const Dashboard = () => {
         </main>
       </div>
 
-      {/* Bottom nav for small screens */}
+      {/* Bottom nav */}
       <div className="md:hidden block bg-white bg-opacity-80 backdrop-blur-md border-t border-pink-400 shadow-md h-16">
         <BottomNav />
       </div>

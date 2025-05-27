@@ -63,7 +63,7 @@ console.log(result);
   };
 
   return (
-    <div className="w-full flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
+<div className="w-full flex items-center justify-center min-h-screen px-4">
       <div className="w-full max-w-lg bg-white/70 backdrop-blur-lg shadow-xl rounded-xl lg:p-4 p-5 text-gray-700 border border-black">
         <h2 className="text-xl sm:text-2xl font-bold text-center text-black mb-3">
           Upload Your <span className="text-fuchsia-700 font-extrabold">BoomX</span> Creation

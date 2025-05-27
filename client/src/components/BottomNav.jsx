@@ -7,9 +7,9 @@ import { FaCloudArrowUp, FaUser } from 'react-icons/fa6';
 
 const navItems = [
   { to: '/', icon: <FaHome size={22} />, label: 'Home' },
-  { to: '/feed', icon: <BiSolidVideos size={22} />, label: 'Feed' },
-  { to: '/shorts', icon: <SiYoutubeshorts size={22} />, label: 'Shorts' },
-  { to: '/upload', icon: <FaCloudArrowUp size={22} />, label: 'Upload' },
+  { to: '/dashboard/feed', icon: <BiSolidVideos size={22} />, label: 'Feed' },
+  { to: '/dashboard/shorts', icon: <SiYoutubeshorts size={22} />, label: 'Shorts' },
+  { to: '/dashboard/upload', icon: <FaCloudArrowUp size={22} />, label: 'Upload' },
   // { to: '/profile', icon: <FaUser size={22} />, label: 'User' },
 ];
 
