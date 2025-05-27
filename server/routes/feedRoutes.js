@@ -13,7 +13,7 @@ router.get("/videos", verifyToken, async (req, res) => {
   try {
     // Fetch current user's purchased videos
     const user = await User.findById(req.user.id).select("purchasedVideos");
-
+// console.log(user);
     // Fetch videos with creator name populated
     const videos = await Video.find()
       .sort({ createdAt: -1 })

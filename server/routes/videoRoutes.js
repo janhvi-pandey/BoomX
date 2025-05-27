@@ -14,7 +14,8 @@ const uploadFields = upload.fields([
 router.post("/upload", uploadFields, verifyToken, async (req, res) => {
   try {
     const { title, description, videoType, isPaid, price, videoUrl } = req.body;
-
+const red=req.user;
+console.log(red)
     const videoFile = req.files.videoFile?.[0] || null;
     const thumbnail = req.files.thumbnail?.[0] || null;
 
@@ -34,7 +35,7 @@ router.post("/upload", uploadFields, verifyToken, async (req, res) => {
     }
 
     const video = new Video({
-      creator: req.userId,
+      creator: req.user.id,
       title,
       description,
       videoType,

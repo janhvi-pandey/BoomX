@@ -7,12 +7,9 @@ const Feed = () => {
   const navigate = useNavigate();
   const containerRef = useRef(null);
 
-  // Remove duplicate videos by _id (if any)
-  const uniqueFeed = Array.from(new Map(feed.map(v => [v._id, v])).values());
-
+  const uniqueFeed = Array.from(new Map(feed.map((v) => [v._id, v])).values());
   const [playingVideoId, setPlayingVideoId] = useState(null);
 
-  // Play first video on load
   useEffect(() => {
     if (uniqueFeed.length > 0 && !playingVideoId) {
       const firstShort = uniqueFeed.find((v) => v.videoType === "short");
@@ -20,7 +17,6 @@ const Feed = () => {
     }
   }, [uniqueFeed, playingVideoId]);
 
-  // Intersection Observer to switch playing video on scroll
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -62,8 +58,10 @@ const Feed = () => {
   return (
     <div
       ref={containerRef}
-      className="w-full mx-auto h-screen overflow-y-auto p-6 bg-white text-black"
+      className="w-full mx-auto h-screen overflow-y-auto p-6 bg-white text-black "
+      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
+      
       <h1 className="text-4xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#843264] to-[#5c136a]">
         Boom Video Feed
       </h1>
@@ -74,7 +72,7 @@ const Feed = () => {
         {uniqueFeed.map((video) => (
           <div
             key={video._id}
-            className="flex flex-col md:flex-row bg-gray-800 rounded-lg shadow-lg cursor-pointer hover:shadow-2xl transition-shadow"
+            className="flex flex-col md:flex-row bg-white text-black border-x-2 border-black  rounded-lg cursor-pointer hover:shadow-xl transition-shadow"
             onClick={() => navigate(`/video/${video._id}`)}
             style={{ minHeight: 220 }}
           >
@@ -103,14 +101,14 @@ const Feed = () => {
             </div>
 
             {/* Right/bottom side */}
-            <div className="flex flex-col flex-grow p-6 space-y-3 text-white">
+            <div className="flex flex-col flex-grow p-6 space-y-3 text-black">
               <h2 className="text-2xl font-bold">{video.title}</h2>
               {video.description && (
-                <p className="text-gray-300 text-base line-clamp-3">
+                <p className="text-gray-700 text-base line-clamp-3">
                   {video.description}
                 </p>
               )}
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600">
                 By <span className="font-semibold">{video.creatorName}</span>
               </p>
 
@@ -136,7 +134,7 @@ const Feed = () => {
                     Watch
                   </button>
                 )}
-                <span className="text-sm text-gray-400 italic">
+                <span className="text-sm text-gray-500 italic">
                   {new Date(video.createdAt).toLocaleDateString()}
                 </span>
               </div>
@@ -149,14 +147,14 @@ const Feed = () => {
             {[...Array(2)].map((_, i) => (
               <div
                 key={i}
-                className="flex flex-col md:flex-row bg-gray-700 rounded-lg animate-pulse h-56"
+                className="flex flex-col md:flex-row bg-gray-300 rounded-lg animate-pulse h-56"
               >
-                <div className="w-full md:w-1/3 bg-gray-600 rounded-t-lg md:rounded-l-lg md:rounded-tr-none" />
+                <div className="w-full md:w-1/3 bg-gray-400 rounded-t-lg md:rounded-l-lg md:rounded-tr-none" />
                 <div className="flex-grow p-6 space-y-4">
-                  <div className="h-8 bg-gray-600 rounded w-3/4" />
-                  <div className="h-6 bg-gray-600 rounded w-full" />
-                  <div className="h-5 bg-gray-600 rounded w-1/2" />
-                  <div className="mt-auto h-8 bg-gray-600 rounded w-1/4" />
+                  <div className="h-8 bg-gray-400 rounded w-3/4" />
+                  <div className="h-6 bg-gray-400 rounded w-full" />
+                  <div className="h-5 bg-gray-400 rounded w-1/2" />
+                  <div className="mt-auto h-8 bg-gray-400 rounded w-1/4" />
                 </div>
               </div>
             ))}
@@ -164,7 +162,9 @@ const Feed = () => {
         )}
 
         {!hasMore && (
-          <p className="text-center text-gray-500 mt-6 mb-10">No more videos.</p>
+          <p className="text-center text-gray-500 mt-6 mb-10">
+            No more videos.
+          </p>
         )}
       </div>
     </div>
