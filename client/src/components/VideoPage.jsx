@@ -1,20 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import useVideo from "../context/video"; 
+import useVideo from "../context/video";
 import Sidebar from "../components/Sidebar";
 import BottomNav from "../components/BottomNav";
+import {
+  IoPlayCircle,
+  IoPlayForwardCircleSharp,
+  IoPlayBackCircleSharp,
+  IoPauseCircleSharp,
+} from "react-icons/io5";
 
 const VideoPage = () => {
   const { id } = useParams();
-  const { getVideoById, addComment } = useVideo();
+  const { getVideoById, addComment, purchaseVideo, getWalletBalance } = useVideo();
 
   const videoRef = useRef(null);
   const [video, setVideo] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [user, setUser] = useState({ name: "Anonymous" });
+  const [purchased, setPurchased] = useState(false);
+  const [wallet, setWallet] = useState(0);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true); 
 
- 
+  // Fetch user profile on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -29,25 +39,42 @@ const VideoPage = () => {
     }
   }, []);
 
-  // Fetch video and its comments whenever `id` changes
+  // Fetch video by ID whenever ID changes
   useEffect(() => {
     if (!id) return;
 
+    setLoading(true);
     getVideoById(id)
       .then((data) => {
         if (!data || data.message) {
           console.error("Failed to fetch video:", data?.message);
           setVideo(null);
           setComments([]);
-          return;
+          setPurchased(false);
+        } else {
+          setVideo(data);
+          setComments(data.comments || []);
+          setPurchased(data.purchased || false); 
         }
-        setVideo(data);
-        setComments(data.comments || []);
       })
       .catch((err) => {
         console.error("Error loading video:", err);
-      });
+      })
+      .finally(() => setLoading(false));
   }, [id, getVideoById]);
+
+  // Fetch wallet balance on mount
+  useEffect(() => {
+    const fetchWallet = async () => {
+      try {
+        const balance = await getWalletBalance();
+        setWallet(balance);
+      } catch (err) {
+        console.error("Failed to fetch wallet:", err);
+      }
+    };
+    fetchWallet();
+  }, [getWalletBalance]);
 
   // Video control handlers
   const playVideo = () => videoRef.current?.play();
@@ -59,7 +86,7 @@ const VideoPage = () => {
     if (videoRef.current) videoRef.current.currentTime -= 10;
   };
 
-  
+  // Add new comment
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -77,6 +104,51 @@ const VideoPage = () => {
     }
   };
 
+  // Purchase video handler
+  const handlePurchase = async () => {
+    setError("");
+
+    
+    if (!video.price || video.price === 0) {
+      setPurchased(true);
+      return;
+    }
+
+    if (wallet < video.price) {
+      setError("Insufficient balance to purchase this video.");
+      return;
+    }
+
+    try {
+      const result = await purchaseVideo(id);
+      if (result.success) {
+        setPurchased(true);
+        setWallet((prev) => prev - video.price);
+      } else {
+        setError(result.message || "Purchase failed");
+      }
+    } catch (err) {
+      console.error("Error purchasing video:", err);
+      setError("Purchase failed. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+  if (purchased && videoRef.current) {
+    videoRef.current.play().catch((err) => {
+      console.warn("Auto play prevented:", err);
+    });
+  }
+}, [purchased]);
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <h1 className="text-2xl font-bold mb-4">Loading video...</h1>
+      </div>
+    );
+  }
+
   if (!video) {
     return (
       <div className="max-w-4xl mx-auto p-6">
@@ -85,52 +157,83 @@ const VideoPage = () => {
     );
   }
 
+
+  const canWatch = video.short || purchased || !video.price || video.price === 0;
+
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar for large screens */}
       <div className="hidden lg:block w-64">
         <Sidebar />
       </div>
 
-      {/* BottomNav for small screens */}
       <div className="sm:hidden fixed bottom-0 left-0 w-full z-50">
         <BottomNav />
       </div>
 
-      {/* Main content */}
       <main className="flex-1 p-6 space-y-6">
         <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
           Boom Video: {video.title}
         </h1>
         <p className="text-lg font-medium text-gray-700 mb-10">
-          Get ready to dive in — turn up the volume, enjoy the ride & let us know
-          what you think!
+          Get ready to dive in — turn up the volume, enjoy the ride & let us know what you think!
         </p>
+
+        {!canWatch && video.price > 0 && (
+          <div className="mb-6 p-6 border border-purple-300 rounded-lg bg-purple-50 shadow-md">
+            <p className="text-[#622a6d] font-semibold text-lg mb-4">
+              This premium video costs{" "}
+              <span className="font-bold">{video.price} coins</span> to unlock.
+            </p>
+            <button
+              onClick={handlePurchase}
+              className="bg-[#622a6d] text-white px-6 py-3 text-lg rounded hover:bg-purple-800 transition font-semibold shadow-md"
+            >
+              Purchase & Watch
+            </button>
+            {error && (
+              <p className="text-red-600 mt-3 font-medium">
+                {error}
+              </p>
+            )}
+          </div>
+        )}
 
         <video
           ref={videoRef}
           src={video.videoUrl}
           controls={false}
-          className="w-full max-h-[480px] rounded-md bg-black shadow-lg"
+          className={`w-full max-h-[480px] rounded-md bg-black shadow-lg ${
+            !canWatch ? "opacity-30 pointer-events-none" : ""
+          }`}
         />
 
-        {/* Video Controls */}
-        <div className="flex justify-center space-x-4">
-          <button onClick={backwardVideo} className="video-btn">
-            ⏪ 10s
+        <div className="flex justify-center space-x-6 mt-4">
+          <button
+            onClick={backwardVideo}
+            className="flex items-center gap-2 bg-[#622a6d] hover:bg-[#3c1743] text-white text-xl px-5 py-3 rounded-full shadow-md transition"
+          >
+            <IoPlayBackCircleSharp /> 10s
           </button>
-          <button onClick={playVideo} className="video-btn">
-            ▶️ Play
+          <button
+            onClick={playVideo}
+            className="flex items-center gap-2 bg-[#622a6d] hover:bg-[#3c1743] text-white text-xl px-5 py-3 rounded-xl shadow-md transition"
+          >
+            <IoPlayCircle /> Play
           </button>
-          <button onClick={pauseVideo} className="video-btn">
-            ⏸ Pause
+          <button
+            onClick={pauseVideo}
+            className="flex items-center gap-2 bg-[#622a6d] hover:bg-[#3c1743] text-white text-xl px-5 py-3 rounded-xl shadow-md transition"
+          >
+            <IoPauseCircleSharp /> Pause
           </button>
-          <button onClick={forwardVideo} className="video-btn">
-            10s ⏩
+          <button
+            onClick={forwardVideo}
+            className="flex items-center gap-2 bg-[#622a6d] hover:bg-[#3c1743] text-white text-xl px-5 py-3 rounded-full shadow-md transition"
+          >
+            <IoPlayForwardCircleSharp /> 10s
           </button>
         </div>
 
-        {/* Comments Section */}
         <section>
           <h2 className="text-2xl font-semibold mb-4 mt-8 text-gray-900">
             Comments

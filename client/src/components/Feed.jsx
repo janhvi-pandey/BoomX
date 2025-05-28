@@ -121,9 +121,10 @@ const Feed = () => {
                   <button
                     className="bg-orange-600 px-4 py-2 rounded-lg text-lg font-semibold hover:bg-orange-700 transition"
                     onClick={(e) => {
-                      e.stopPropagation();
-                      alert(`Redirect to buy page for ₹${video.price}`);
-                    }}
+  e.stopPropagation();
+  navigate(`/video/${video._id}`);
+}}
+
                   >
                     Buy for ₹{video.price}
                   </button>
