@@ -61,14 +61,13 @@ const Feed = () => {
       className="w-full mx-auto h-screen overflow-y-auto p-6 bg-white text-black "
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
-      
       <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
         Boom Video Feed
       </h1>
       <p className="text-lg font-medium text-gray-700 mb-10">
-  From quick laughs to deep dives — your next favorite video is right here.
-</p>
-
+        From quick laughs to deep dives — your next favorite video is right
+        here.
+      </p>
 
       <div className="space-y-10">
         {uniqueFeed.length === 0 && !loading && (
@@ -77,7 +76,7 @@ const Feed = () => {
         {uniqueFeed.map((video) => (
           <div
             key={video._id}
-            className="flex flex-col md:flex-row bg-white text-black border-x-2 border-black  rounded-lg cursor-pointer hover:shadow-xl transition-shadow"
+            className="flex flex-col md:flex-row bg-white text-black border-y border-x-2 border-black  rounded-lg cursor-pointer hover:shadow-xl transition-shadow"
             onClick={() => navigate(`/video/${video._id}`)}
             style={{ minHeight: 220 }}
           >

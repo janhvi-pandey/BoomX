@@ -1,14 +1,12 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import VideoPage from "./components/VideoPage";
 import Dashboard from "./components/Dashboard";
 import LandingPage from "./components/LandingPage";
 import Register from "./components/Register";
 import Login from "./components/Login";
 import { VideoProvider } from "./context/video";
 import { VideoFeedProvider } from "./context/VideoFeedContext";
-import VideoPage from "./components/VideoPage";
-
 function App() {
   return (
     <Router>
