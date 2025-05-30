@@ -1,4 +1,4 @@
-import React from "react";
+
 const Toast = ({ message, type = "success", visible }) => {
   if (!visible) return null;
 

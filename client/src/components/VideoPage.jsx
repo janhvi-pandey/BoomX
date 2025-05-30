@@ -9,7 +9,7 @@ import {
   IoPlayBackCircleSharp,
   IoPauseCircleSharp,
 } from "react-icons/io5";
-import Toast from "../reusable/toast";
+import Toast from "../reusable/Toast";
 
 const EmbedPlayer = ({ embedUrl, thumbnailUrl, title }) => {
   const [showIframe, setShowIframe] = useState(false);
