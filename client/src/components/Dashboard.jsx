@@ -1,11 +1,19 @@
-import { Routes, Route } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import Feed from "../components/Feed";
-import Upload from "../components/Upload";
-import Shorts from "../components/Shorts";
-import BottomNav from "../components/BottomNav";
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
+import Feed from '../components/Feed';
+import Upload from '../components/Upload';
+import Shorts from '../components/Shorts';
+import BottomNav from '../components/BottomNav';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    navigate('/login', { replace: true });
+    return null; 
+  }
+
   return (
     <div className="h-screen max-h-screen flex flex-col overflow-hidden text-purple-900">
       {/* Main layout */}
@@ -15,7 +23,7 @@ const Dashboard = () => {
           <Sidebar />
         </div>
 
-        {/* Main content with scrollable area */}
+        {/* Main content  */}
         <main className="flex-1 overflow-y-auto max-h-screen p-4">
           <div className="w-full mx-auto">
             <Routes>
