@@ -23,10 +23,10 @@ const userSchema = new mongoose.Schema(
 
     wallet: {
       type: Number,
-      default: 500, 
+      default: 1000, 
     },
 
-    // List of purchased video IDs (long-form only)
+ 
     purchasedVideos: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,7 +34,6 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-    // List of videos the user has uploaded 
     uploadedVideos: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -42,7 +41,6 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-    // Gift actions 
     giftHistory: [
       {
         videoId: {
@@ -65,6 +63,29 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+
+
+receivedGifts: [
+  {
+    videoId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Video",
+    },
+    senderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
+    receivedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+],
+
   },
   {
     timestamps: true, 

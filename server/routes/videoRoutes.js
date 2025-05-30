@@ -5,7 +5,7 @@ const verifyToken = require("../middleware/verifyToken");
 const Video = require("../models/Video");
 const uploadToS3 = require("../services/awsUploader");
 const fs = require("fs");
-const User = require("../models/User"); 
+const User = require("../models/User");
 
 const uploadFields = upload.fields([
   { name: "videoFile", maxCount: 1 },
@@ -56,7 +56,10 @@ router.post("/upload", uploadFields, verifyToken, async (req, res) => {
 // Get a specific video by ID (with comments)
 router.get("/:id", verifyToken, async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id).populate("creator", "name");
+    const video = await Video.findById(req.params.id).populate(
+      "creator",
+      "name"
+    );
     if (!video) return res.status(404).json({ message: "Video not found" });
 
     const userId = req.user.id;
@@ -77,7 +80,6 @@ router.get("/:id", verifyToken, async (req, res) => {
       creatorName: video.creator?.name || "Unknown",
       purchased,
     });
-   
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -158,7 +160,7 @@ router.post("/:videoId/purchase", verifyToken, async (req, res) => {
   }
 });
 
-// Gift video creator
+//Gift Video Creator
 router.post("/gift/:videoId", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -166,18 +168,30 @@ router.post("/gift/:videoId", verifyToken, async (req, res) => {
     const { amount } = req.body;
 
     if (!amount || amount <= 0) {
-      return res.status(400).json({ message: "Invalid gift amount" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid gift amount" });
     }
 
     const user = await User.findById(userId);
     const video = await Video.findById(videoId).populate("creator");
 
     if (!video) {
-      return res.status(404).json({ message: "Video not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Video not found" });
+    }
+
+    if (video.creator._id.toString() === userId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "You can't gift your own video" });
     }
 
     if (user.wallet < amount) {
-      return res.status(400).json({ message: "Insufficient balance" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Insufficient balance" });
     }
 
     user.wallet -= amount;
@@ -185,13 +199,31 @@ router.post("/gift/:videoId", verifyToken, async (req, res) => {
       videoId: video._id,
       creatorId: video.creator._id,
       amount,
+      giftedAt: new Date(),
+    });
+
+    video.creator.wallet += amount;
+
+    video.creator.receivedGifts = video.creator.receivedGifts || [];
+    video.creator.receivedGifts.push({
+      videoId: video._id,
+      senderId: user._id,
+      amount,
+      receivedAt: new Date(),
     });
 
     await user.save();
+    await video.creator.save();
 
-    res.status(200).json({ message: `Gifted ₹${amount} to ${video.creator.name}` });
+    res.status(200).json({
+      success: true,
+      message: `Gifted ₹${amount} to ${video.creator.name}`,
+      senderBalance: user.wallet,
+      creatorBalance: video.creator.wallet,
+    });
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Gift error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
