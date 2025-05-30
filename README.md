@@ -206,12 +206,20 @@ server/
 | POST   | `/login`         | Log in a user                  | `{ email, password }`           |
 | GET    | `/profile`       | Get logged-in user's profile   | (JWT token in headers)          |
 
-### Video Routes (`/api/videos`)
-| Method | Endpoint         | Description                            | Body / Files                                 |
-|--------|------------------|----------------------------------------|-----------------------------------------------|
-| POST   | `/upload`        | Upload a video (short or long)         | FormData with fields + `videoFile`, `thumbnail` |
-| GET    | `/:id`           | Get video by ID with comments          | (JWT token in headers)                        |
-| POST   | `/:id/comments`  | Add comment to video                   | `{ content }` + (JWT token)                   |
+
+
+###  Video Routes (`/api/videos`)
+
+| Method | Endpoint             | Description                               | Body / Files / Notes                                                                                                      |
+| ------ | -------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `POST` | `/upload`            | Upload a video (short or long)            | **FormData**: `title`, `description`, `videoType`, `isPaid`, `price`, `videoFile`, `thumbnail` <br>**Headers**: JWT Token |
+| `GET`  | `/:id`               | Get video by ID with creator and comments | **Headers**: JWT Token                                                                                                    |
+| `POST` | `/:id/comments`      | Add a comment to a video                  | **Body**: `{ content }` <br>**Headers**: JWT Token                                                                        |
+| `POST` | `/:videoId/purchase` | Purchase a paid video                     | **Headers**: JWT Token                                                                                                    |
+| `POST` | `/gift/:videoId`     | Gift money to the video creator           | **Body**: `{ amount }` <br>**Headers**: JWT Token                                                                         |
+
+---
+
 
 ### Feed Routes (`/api/feed`)
 | Method | Endpoint         | Description                       | Query           |
