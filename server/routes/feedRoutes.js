@@ -11,16 +11,16 @@ router.get("/videos", verifyToken, async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    // Fetch current user's purchased videos
+    
     const user = await User.findById(req.user.id).select("purchasedVideos");
 // console.log(user);
-    // Fetch videos with creator name populated
+   
     const videos = await Video.find()
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate("creator", "name")
-      .lean(); // lean returns plain JS objects (not Mongoose documents)
+      .lean(); 
 
     const feed = videos.map((video) => {
       const isPurchased = user?.purchasedVideos?.some(
