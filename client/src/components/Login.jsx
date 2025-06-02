@@ -14,8 +14,6 @@ import {
 } from "react-icons/md";
 import Toast from "../reusable/Toast";
 
-
-
 const FloatingIcon = ({ Icon, style }) => (
   <Icon
     className="absolute opacity-20 text-purple-700 pointer-events-none"
@@ -24,6 +22,9 @@ const FloatingIcon = ({ Icon, style }) => (
 );
 
 const Login = () => {
+
+  // const serverUrl = "http://localhost:5000";
+  const serverUrl = "https://server-boom-x.vercel.app";
   const [form, setForm] = useState({ email: "", password: "" });
   const [toast, setToast] = useState({ message: "", visible: false, type: "" });
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch(`${serverUrl}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +74,11 @@ const Login = () => {
   };
   return (
     <>
-      <Toast message={toast.message} type={toast.type} visible={toast.visible} />
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        visible={toast.visible}
+      />
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 px-4 relative overflow-hidden">
         {/* Floating Icons */}
         <div className="absolute inset-0 z-0">

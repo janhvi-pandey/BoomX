@@ -3,7 +3,8 @@ import { createContext, useContext } from "react";
 const VideoContext = createContext(null);
 
 export const VideoProvider = ({ children }) => {
-  const serverUrl = "http://localhost:5000";
+  // const serverUrl = "http://localhost:5000";
+  const serverUrl = "https://server-boom-x.vercel.app";
 
   const uploadVideo = async (videoData) => {
     try {
@@ -40,7 +41,9 @@ export const VideoProvider = ({ children }) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Fetch video failed: ${response.status} - ${errorText}`);
+        throw new Error(
+          `Fetch video failed: ${response.status} - ${errorText}`
+        );
       }
 
       const data = await response.json();
@@ -69,7 +72,9 @@ export const VideoProvider = ({ children }) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Add comment failed: ${response.status} - ${errorText}`);
+        throw new Error(
+          `Add comment failed: ${response.status} - ${errorText}`
+        );
       }
 
       const data = await response.json();
@@ -83,12 +88,15 @@ export const VideoProvider = ({ children }) => {
   const purchaseVideo = async (videoId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${serverUrl}/api/videos/${videoId}/purchase`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${serverUrl}/api/videos/${videoId}/purchase`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -114,7 +122,9 @@ export const VideoProvider = ({ children }) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Fetch wallet balance failed: ${response.status} - ${errorText}`);
+        throw new Error(
+          `Fetch wallet balance failed: ${response.status} - ${errorText}`
+        );
       }
 
       const data = await response.json();
@@ -126,32 +136,29 @@ export const VideoProvider = ({ children }) => {
   };
 
   const giftVideoCreator = async (videoId, amount) => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch(`${serverUrl}/api/videos/gift/${videoId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ amount }),
-    });
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${serverUrl}/api/videos/gift/${videoId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ amount }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Gift failed: ${response.status} - ${errorText}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Gift failed: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error gifting video creator:", error);
+      throw error;
     }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error gifting video creator:", error);
-    throw error;
-  }
-};
-
-
-
+  };
 
   return (
     <VideoContext.Provider

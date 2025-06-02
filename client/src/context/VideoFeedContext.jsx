@@ -15,13 +15,16 @@ export const VideoFeedProvider = ({ children }) => {
   const [hasMore, setHasMore] = useState(true);
 
   const fetchFeed = useCallback(async () => {
+    // const serverUrl = "http://localhost:5000";
+    const serverUrl = "https://server-boom-x.vercel.app";
+
     if (loading || !hasMore) return;
     setLoading(true);
 
     try {
       const token = localStorage.getItem("token");
       const res = await fetch(
-        `http://localhost:5000/api/feed/videos?page=${page}&limit=10`,
+        `${serverUrl}/api/feed/videos?page=${page}&limit=10`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

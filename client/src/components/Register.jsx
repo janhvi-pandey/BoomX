@@ -21,6 +21,9 @@ const FloatingIcon = ({ Icon, style }) => (
 );
 
 const Register = () => {
+
+    // const serverUrl = "http://localhost:5000";
+  const serverUrl = "https://server-boom-x.vercel.app";
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
 
@@ -32,7 +35,7 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch(`${serverUrl}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
