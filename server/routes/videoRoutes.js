@@ -33,6 +33,7 @@ router.post("/upload", uploadFields, verifyToken, async (req, res) => {
       const uploadResult = await uploadToS3(thumbnail.path, "thumbnail");
       thumbnailUrl = uploadResult.Location;
       videoFileUrl = videoUrl;
+      fs.unlinkSync(thumbnail.path);
     }
 
     const video = new Video({
