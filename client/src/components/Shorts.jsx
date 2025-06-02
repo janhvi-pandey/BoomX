@@ -8,7 +8,7 @@ const Shorts = () => {
   const containerRef = useRef(null);
   const [playingVideoId, setPlayingVideoId] = useState(null);
 
-  // Filter shorts and remove duplicates
+ 
   const shortFeed = Array.from(
     new Map(
       feed
@@ -50,7 +50,7 @@ const Shorts = () => {
     if (!containerRef.current || loading || !hasMore) return;
     const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
     if (scrollHeight - scrollTop - clientHeight < 150) {
-      fetchFeed(); // Load more shorts
+      fetchFeed(); 
     }
   }, [loading, hasMore, fetchFeed]);
 
@@ -67,7 +67,7 @@ const Shorts = () => {
       className="w-full mx-auto h-screen overflow-y-auto p-6 bg-white text-black"
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
     >
-      <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
+      <h1 className="text-4xl font-extrabold mb-2 mt-4 lg:mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
         Quick Flicks, Just for You!
       </h1>
       <p className="text-lg font-medium text-gray-700 mb-10 ">
