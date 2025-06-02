@@ -14,13 +14,15 @@ const getGreeting = () => {
 };
 
 const Sidebar = () => {
+  // const serverUrl = "http://localhost:5000";
+  const serverUrl = "https://server-boom-x.vercel.app";
   const [username, setUsername] = useState("User");
   const greeting = getGreeting();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetch("http://localhost:5000/api/auth/profile", {
+      fetch(`${serverUrl}/api/auth/profile`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
