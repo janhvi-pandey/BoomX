@@ -21,6 +21,9 @@ app.use('/api/auth', authRoutes);
 app.use("/api/videos", videoRoutes);
 app.use("/api/feed", feedRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
 
 // Start server
 const PORT = 5000;
