@@ -6,10 +6,10 @@ const { v4: uuidv4 } = require("uuid");
 dotenv.config();
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_REGION__BOOMX,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: process.env.AWS_ACCESS_KEY__BOOMX,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY__BOOMX,
   },
 });
 
@@ -19,7 +19,7 @@ const uploadToS3 = async (filePath, type) => {
   const uniqueFileName = `${type}s/${uuidv4()}${fileExtension}`;
 
   const uploadParams = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.AWS_BUCKET_NAME__BOOMX,
     Key: uniqueFileName,
     Body: fileStream,
     ContentType: type === "video" ? "video/mp4" : "image/jpeg",
@@ -29,7 +29,7 @@ const uploadToS3 = async (filePath, type) => {
     const command = new PutObjectCommand(uploadParams);
     await s3Client.send(command);
  
-    const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${uniqueFileName}`;
+    const fileUrl = `https://${process.env.AWS_BUCKET_NAME__BOOMX}.s3.${process.env.AWS_REGION__BOOMX}.amazonaws.com/${uniqueFileName}`;
     return { Location: fileUrl };
   } catch (err) {
     console.error("S3 upload error:", err);
