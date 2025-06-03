@@ -1,18 +1,17 @@
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const multer = require('multer');
+const path = require('path');
+const os = require('os');
 
-const uploadDir = path.join(__dirname, "../uploads");
-
-// It ensure uploads directory exists dynamically
-fs.mkdirSync(uploadDir, { recursive: true });
+// Use /tmp directory for serverless environments
+const uploadDir = path.join(os.tmpdir(), 'uploads');
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const uniqueSuffix = Date.now() + '-' + file.originalname;
+    cb(null, uniqueSuffix);
   },
 });
 
