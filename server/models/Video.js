@@ -23,17 +23,24 @@ const videoSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  likes: {
-    type: Number,
-    default: 0,
-  },
+ likes: [{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User"
+}],
+
   createdAt: {
     type: Date,
     default: Date.now,
   },
   comments: [
     {
-      username: String,
+      user: {  
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      username: String,  
+      avatar: String,
       content: String,
       createdAt: {
         type: Date,

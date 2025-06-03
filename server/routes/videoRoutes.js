@@ -12,11 +12,10 @@ const uploadFields = upload.fields([
   { name: "thumbnail", maxCount: 1 },
 ]);
 
+// Upload a new video
 router.post("/upload", uploadFields, verifyToken, async (req, res) => {
   try {
     const { title, description, videoType, isPaid, price, videoUrl } = req.body;
-    // console.log(req.user);
-
     const videoFile = req.files.videoFile?.[0] || null;
     const thumbnail = req.files.thumbnail?.[0] || null;
 
@@ -24,16 +23,21 @@ router.post("/upload", uploadFields, verifyToken, async (req, res) => {
     let thumbnailUrl;
 
     if (videoType === "short") {
+      if (!videoFile) {
+        return res.status(400).json({ message: "Video file required for short videos" });
+      }
       const uploadResult = await uploadToS3(videoFile.path, "video");
       videoFileUrl = uploadResult.Location;
       fs.unlinkSync(videoFile.path);
     }
 
     if (videoType === "long") {
-      const uploadResult = await uploadToS3(thumbnail.path, "thumbnail");
-      thumbnailUrl = uploadResult.Location;
+      if (thumbnail) {
+        const uploadResult = await uploadToS3(thumbnail.path, "thumbnail");
+        thumbnailUrl = uploadResult.Location;
+        fs.unlinkSync(thumbnail.path);
+      }
       videoFileUrl = videoUrl;
-      fs.unlinkSync(thumbnail.path);
     }
 
     const video = new Video({
@@ -41,10 +45,10 @@ router.post("/upload", uploadFields, verifyToken, async (req, res) => {
       title,
       description,
       videoType,
-      videoUrl: videoType === "short" ? videoFileUrl : videoUrl,
+      videoUrl: videoFileUrl,
       isPaid,
       price,
-      thumbnail: videoType === "long" ? thumbnailUrl : null,
+      thumbnail: thumbnailUrl || null,
     });
 
     await video.save();
@@ -54,14 +58,17 @@ router.post("/upload", uploadFields, verifyToken, async (req, res) => {
   }
 });
 
-// Get a specific video by ID (with comments)
+// Get a specific video by ID
 router.get("/:id", verifyToken, async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id).populate(
-      "creator",
-      "name"
-    );
+    const video = await Video.findById(req.params.id)
+      .populate("creator", "name avatar")
+      .populate("likes", "name avatar");
     if (!video) return res.status(404).json({ message: "Video not found" });
+
+    // Increment views count
+    video.views = (video.views || 0) + 1;
+    await video.save();
 
     const userId = req.user.id;
     const user = await User.findById(userId);
@@ -79,12 +86,16 @@ router.get("/:id", verifyToken, async (req, res) => {
       createdAt: video.createdAt,
       comments: video.comments,
       creatorName: video.creator?.name || "Unknown",
+      creatorAvatar: video.creator?.avatar || null,
+      likes: video.likes,
       purchased,
+      views: video.views,  
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // Add comment to a video
 router.post("/:id/comments", verifyToken, async (req, res) => {
@@ -93,26 +104,20 @@ router.post("/:id/comments", verifyToken, async (req, res) => {
     const { content } = req.body;
     const userId = req.user?.id;
 
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized, user ID missing" });
-    }
-
     if (!content) {
       return res.status(400).json({ message: "Content is required" });
     }
 
     const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     const video = await Video.findById(videoId);
-    if (!video) {
-      return res.status(404).json({ message: "Video not found" });
-    }
+    if (!video) return res.status(404).json({ message: "Video not found" });
 
     const newComment = {
+      user: user._id,
       username: user.name,
+      avatar: user.avatar,
       content,
       createdAt: new Date(),
     };
@@ -120,17 +125,48 @@ router.post("/:id/comments", verifyToken, async (req, res) => {
     video.comments.push(newComment);
     await video.save();
 
-    res.status(201).json({
-      message: "Comment added",
-      comments: video.comments,
-    });
+    res.status(201).json({ message: "Comment added", comments: video.comments });
   } catch (error) {
     console.error("Add comment error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// Purchase video - updated route path: /:videoId/purchase
+// Like or unlike a video
+router.post("/:videoId/like", verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const videoId = req.params.videoId;
+
+    const video = await Video.findById(videoId).populate("likes", "name avatar");
+    if (!video) return res.status(404).json({ message: "Video not found" });
+
+    const alreadyLiked = video.likes.some((u) => u._id.toString() === userId);
+
+    if (alreadyLiked) {
+      video.likes = video.likes.filter((u) => u._id.toString() !== userId);
+    } else {
+      video.likes.push(userId);
+    }
+
+    await video.save();
+    await video.populate("likes", "name avatar");
+
+    res.status(200).json({
+      message: alreadyLiked ? "Unliked the video" : "Liked the video",
+      likes: video.likes.map((user) => ({
+        _id: user._id,
+        name: user.name,
+        avatar: user.avatar,
+      })),
+    });
+  } catch (err) {
+    console.error("Like route error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Purchase a paid video
 router.post("/:videoId/purchase", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -161,7 +197,7 @@ router.post("/:videoId/purchase", verifyToken, async (req, res) => {
   }
 });
 
-//Gift Video Creator
+// Gift a video creator
 router.post("/gift/:videoId", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -169,33 +205,26 @@ router.post("/gift/:videoId", verifyToken, async (req, res) => {
     const { amount } = req.body;
 
     if (!amount || amount <= 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid gift amount" });
+      return res.status(400).json({ success: false, message: "Invalid gift amount" });
     }
 
     const user = await User.findById(userId);
     const video = await Video.findById(videoId).populate("creator");
 
     if (!video) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Video not found" });
+      return res.status(404).json({ success: false, message: "Video not found" });
     }
 
     if (video.creator._id.toString() === userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "You can't gift your own video" });
+      return res.status(400).json({ success: false, message: "You can't gift your own video" });
     }
 
     if (user.wallet < amount) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Insufficient balance" });
+      return res.status(400).json({ success: false, message: "Insufficient balance" });
     }
 
     user.wallet -= amount;
+    user.giftHistory = user.giftHistory || [];
     user.giftHistory.push({
       videoId: video._id,
       creatorId: video.creator._id,
@@ -204,7 +233,6 @@ router.post("/gift/:videoId", verifyToken, async (req, res) => {
     });
 
     video.creator.wallet += amount;
-
     video.creator.receivedGifts = video.creator.receivedGifts || [];
     video.creator.receivedGifts.push({
       videoId: video._id,

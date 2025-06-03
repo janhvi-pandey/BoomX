@@ -11,27 +11,36 @@ router.get("/videos", verifyToken, async (req, res) => {
   const skip = (page - 1) * limit;
 
   try {
-    
-    const user = await User.findById(req.user.id).select("purchasedVideos");
-// console.log(user);
-   
+    const user = await User.findById(req.user.id)
+      .select("purchasedVideos")
+      .lean();
+
     const videos = await Video.find()
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate("creator", "name")
-      .lean(); 
+      .populate("comments.user", "avatar name")
+      .lean();
 
     const feed = videos.map((video) => {
       const isPurchased = user?.purchasedVideos?.some(
         (v) => v.toString() === video._id.toString()
       );
 
+      const commentsWithUser = (video.comments || []).map((comment) => ({
+        _id: comment._id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        username: comment.username || comment.user?.name || "Unknown",
+        avatar: comment.user?.avatar || "https://ui-avatars.com/api/?name=User",
+      }));
+
       return {
         _id: video._id,
         title: video.title,
         description: video.description,
-        comments: video.comments || [],
+        comments: commentsWithUser,
         creatorName: video.creator?.name || "Unknown",
         videoType: video.videoType,
         videoUrl: video.videoUrl,
@@ -39,6 +48,8 @@ router.get("/videos", verifyToken, async (req, res) => {
         isPaid: video.isPaid,
         price: video.price,
         createdAt: video.createdAt,
+        likes: video.likes ?? 0,
+        views: video.views ?? 0,
         access:
           video.videoType === "short" || !video.isPaid || isPurchased
             ? "watch"

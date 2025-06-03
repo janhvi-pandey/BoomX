@@ -30,7 +30,8 @@ export const VideoFeedProvider = ({ children }) => {
         }
       );
       const data = await res.json();
-      // console.log(data)
+      console.log(data);
+
       if (res.ok) {
         setFeed((prev) => [...prev, ...data.feed]);
         if (data.feed.length < 10) setHasMore(false);
@@ -41,15 +42,31 @@ export const VideoFeedProvider = ({ children }) => {
     } catch (e) {
       console.error("Failed to fetch feed", e);
     }
+
     setLoading(false);
   }, [page, loading, hasMore]);
 
+ 
+  const resetFeed = () => {
+    setFeed([]);
+    setPage(1);
+    setHasMore(true);
+  };
+
   useEffect(() => {
     fetchFeed();
-  }, []);
+  }, [fetchFeed]);
 
   return (
-    <VideoFeedContext.Provider value={{ feed, fetchFeed, loading, hasMore }}>
+    <VideoFeedContext.Provider
+      value={{
+        feed,
+        fetchFeed,
+        resetFeed,
+        loading,
+        hasMore,
+      }}
+    >
       {children}
     </VideoFeedContext.Provider>
   );
