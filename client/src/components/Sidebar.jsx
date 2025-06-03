@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import { FaHome } from "react-icons/fa";
 import { SiYoutubeshorts } from "react-icons/si";
 import { BiSolidVideos } from "react-icons/bi";
 import { FaCloudArrowUp } from "react-icons/fa6";
+import { useUser } from "../context/UserContext";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -14,38 +15,8 @@ const getGreeting = () => {
 };
 
 const Sidebar = () => {
-  // const serverUrl = "http://localhost:5000";
-  const serverUrl = "https://server-boom-x.vercel.app";
-  const [username, setUsername] = useState("User");
+  const { user } = useUser();
   const greeting = getGreeting();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetch(`${serverUrl}/api/auth/profile`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Unauthorized");
-          }
-          return res.json();
-        })
-        .then((data) => {
-          if (data && data.name) {
-            setUsername(data.name);
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to fetch profile:", err.message);
-          localStorage.removeItem("token");
-        });
-    }
-  }, []);
 
   const navItems = [
     { to: "/", icon: <FaHome />, label: "Home" },
@@ -60,7 +31,7 @@ const Sidebar = () => {
       <div className="mb-10">
         <h2 className="text-lg font-medium text-gray-300">{greeting},</h2>
         <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-[#ab4081] to-[#7b1c8f] ">
-          {username}
+          {user?.name || "User"}
         </h1>
       </div>
 

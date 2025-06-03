@@ -3,8 +3,8 @@ import { createContext, useContext } from "react";
 const VideoContext = createContext(null);
 
 export const VideoProvider = ({ children }) => {
-  // const serverUrl = "http://localhost:5000";
-  const serverUrl = "https://server-boom-x.vercel.app";
+  const serverUrl = "http://localhost:5000";
+  // const serverUrl = "https://server-boom-x.vercel.app";
 
   const uploadVideo = async (videoData) => {
     try {

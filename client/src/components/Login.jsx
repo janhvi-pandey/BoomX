@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 import {
   FaPlay,
   FaUserPlus,
@@ -22,55 +23,19 @@ const FloatingIcon = ({ Icon, style }) => (
 );
 
 const Login = () => {
+  const serverUrl = "http://localhost:5000";
 
-  // const serverUrl = "http://localhost:5000";
-  const serverUrl = "https://server-boom-x.vercel.app";
   const [form, setForm] = useState({ email: "", password: "" });
   const [toast, setToast] = useState({ message: "", visible: false, type: "" });
-  const navigate = useNavigate();
 
-  const showToast = (message, type = "success") => {
-    setToast({ message, visible: true, type });
-    setTimeout(() => {
-      setToast({ message: "", visible: false, type: "" });
-    }, 2000);
-  };
+  const { login } = useUser();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch(`${serverUrl}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        showToast(data.message || "Login failed", "error");
-        return;
-      }
-
-      localStorage.setItem("token", data.token);
-
-      showToast("Login successful! Redirecting...");
-      setForm({ email: "", password: "" });
-
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1500);
-    } catch (error) {
-      console.error("Login error:", error);
-      showToast("Something went wrong. Please try again.", "error");
-    }
+    login(form, setToast, () => setForm({ email: "", password: "" }));
   };
   return (
     <>

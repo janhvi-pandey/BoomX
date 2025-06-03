@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaPlay,
   FaUserPlus,
@@ -11,7 +11,8 @@ import {
   MdOutlineEdit,
   MdOutlineOndemandVideo,
 } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const FloatingIcon = ({ Icon, style }) => (
   <Icon
@@ -20,46 +21,36 @@ const FloatingIcon = ({ Icon, style }) => (
   />
 );
 
-const Register = () => {
+const Toast = ({ message, type }) => {
+  if (!message) return null;
+  const baseClasses =
+    "fixed top-4 right-4 px-4 py-2 rounded shadow font-semibold z-50 transition-opacity duration-300";
+  const colorClass =
+    type === "error" ? "bg-red-500 text-white" : "bg-green-500 text-white";
 
-    // const serverUrl = "http://localhost:5000";
-  const serverUrl = "https://server-boom-x.vercel.app";
+  return <div className={`${baseClasses} ${colorClass}`}>{message}</div>;
+};
+
+const Register = () => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const navigate = useNavigate();
+  const { register, toast } = useUser();
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch(`${serverUrl}/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.message || "Registration failed");
-        return;
-      }
-      setForm({ name: "", email: "", password: "" });
-
-      navigate("/login");
-    } catch (error) {
-      alert("Something went wrong. Please try again later.");
-      console.error("Registration error:", error);
-    }
+    await register(form);
+    // Reset form only if registration succeeded?
+    // Since register navigates on success, no need to reset here.
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 px-4 relative overflow-hidden">
+      {/* Toast */}
+      {toast.visible && <Toast message={toast.message} type={toast.type} />}
+
       <div className="absolute inset-0 z-0">
         <FloatingIcon
           Icon={FaPlay}
@@ -156,7 +147,7 @@ const Register = () => {
 
         {/* Right Form */}
         <div className="md:w-1/2 p-6 md:p-10 flex flex-col justify-center">
-          <form onSubmit={handleRegister} className="space-y-4 md:space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
             <input
               type="text"
               name="name"
@@ -187,7 +178,6 @@ const Register = () => {
               className="w-full px-4 py-2 rounded-lg border border-purple-700 bg-purple-50 placeholder-gray-600 text-purple-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-700 focus:ring-opacity-50 transition"
               autoComplete="new-password"
             />
-
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-[#9d3a75] via-[#7b1c8f] to-[#4d004d] hover:from-[#7b1c8f] hover:via-[#6a0070] hover:to-[#3d003d] text-white font-bold py-2 rounded-lg"

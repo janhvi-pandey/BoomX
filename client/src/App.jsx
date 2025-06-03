@@ -7,10 +7,12 @@ import Register from "./components/Register";
 import Login from "./components/Login";
 import { VideoProvider } from "./context/video";
 import { VideoFeedProvider } from "./context/VideoFeedContext";
+import { UserProvider } from "./context/UserContext";
 function App() {
   return (
     <Router>
-      <VideoProvider>
+      <UserProvider>
+        <VideoProvider>
         <VideoFeedProvider><Routes>
           <Route path="/dashboard/*" element={<Dashboard />} />
           <Route path="/" element={<LandingPage />} />
@@ -20,6 +22,8 @@ function App() {
         </Routes></VideoFeedProvider>
         
       </VideoProvider>
+      </UserProvider>
+      
     </Router>
   );
 }

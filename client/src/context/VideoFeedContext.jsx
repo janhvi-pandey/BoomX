@@ -15,8 +15,8 @@ export const VideoFeedProvider = ({ children }) => {
   const [hasMore, setHasMore] = useState(true);
 
   const fetchFeed = useCallback(async () => {
-    // const serverUrl = "http://localhost:5000";
-    const serverUrl = "https://server-boom-x.vercel.app";
+    const serverUrl = "http://localhost:5000";
+    // const serverUrl = "https://server-boom-x.vercel.app";
 
     if (loading || !hasMore) return;
     setLoading(true);
