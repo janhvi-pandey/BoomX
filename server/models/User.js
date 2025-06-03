@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
     email: {
       type: String,
       required: true,
@@ -15,32 +14,34 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-
     password: {
       type: String,
       required: true,
     },
-
     wallet: {
       type: Number,
-      default: 1000, 
+      default: 1000,
     },
-
- 
+    avatar: {
+      type: String,
+      default: "https://ui-avatars.com/api/?name=User",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     purchasedVideos: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Video",
       },
     ],
-
     uploadedVideos: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Video",
       },
     ],
-
     giftHistory: [
       {
         videoId: {
@@ -63,32 +64,48 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    receivedGifts: [
+      {
+        videoId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Video",
+        },
+        senderId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        amount: {
+          type: Number,
+          required: true,
+        },
+        receivedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
 
-
-receivedGifts: [
-  {
-    videoId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Video",
-    },
-    senderId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    amount: {
-      type: Number,
-      required: true,
-    },
-    receivedAt: {
-      type: Date,
-      default: Date.now,
-    },
+   
+    watchHistory: [
+      {
+        videoId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Video",
+          required: true,
+        },
+        progress: {
+          type: Number,
+          default: 0,
+        },
+        watchedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
-],
-
-  },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 

@@ -5,28 +5,27 @@ const videoSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  title: {
-    type: String,
-  },
-  description: {
-    type: String,
-  },
+  title: String,
+  description: String,
   videoType: {
     type: String,
     enum: ["short", "long"],
   },
-  videoUrl: {
-    type: String,
-  },
-  thumbnail: {
-    type: String,
-  },
+  videoUrl: String,
+  thumbnail: String,
   isPaid: {
     type: Boolean,
     default: false,
   },
-  price: {
+  price: Number,
+  duration: String,
+  views: {
     type: Number,
+    default: 0,
+  },
+  likes: {
+    type: Number,
+    default: 0,
   },
   createdAt: {
     type: Date,
@@ -34,14 +33,8 @@ const videoSchema = new mongoose.Schema({
   },
   comments: [
     {
-      username: {
-        type: String,
-        required: true,
-      },
-      content: {
-        type: String,
-        required: true,
-      },
+      username: String,
+      content: String,
       createdAt: {
         type: Date,
         default: Date.now,
@@ -51,5 +44,4 @@ const videoSchema = new mongoose.Schema({
 });
 
 const Video = mongoose.models.Video || mongoose.model("Video", videoSchema);
-
 module.exports = Video;
