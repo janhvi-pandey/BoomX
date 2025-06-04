@@ -7,8 +7,8 @@ export const UserProvider = ({ children }) => {
   const [toast, setToast] = useState({ message: "", visible: false, type: "" });
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const serverUrl = "http://localhost:5000";
-  // const serverUrl = "https://server-boom-x.vercel.app";
+  // const serverUrl = "http://localhost:5000";
+  const serverUrl = "https://server-boom-x.vercel.app";
 
   const showToast = (message, type = "success") => {
     setToast({ message, visible: true, type });
@@ -33,7 +33,8 @@ export const UserProvider = ({ children }) => {
       const data = await res.json();
       setUser(data);
     } catch (err) {
-      console.error("Failed to fetch profile:", err);
+      alert("Failed to fetch profile");
+      // console.error("Failed to fetch profile:", err);
       localStorage.removeItem("token");
       setUser(null);
     }
@@ -64,7 +65,7 @@ export const UserProvider = ({ children }) => {
       setTimeout(() => navigate("/dashboard"), 1500);
       return true;
     } catch (err) {
-      console.error("Login error:", err);
+      // console.error("Login error:", err);
       showToast("Something went wrong. Please try again.", "error");
       return false;
     }
@@ -88,14 +89,16 @@ export const UserProvider = ({ children }) => {
       navigate("/login");
       return true;
     } catch (err) {
-      console.error("Registration error:", err);
+      // console.error("Registration error:", err);
       alert("Something went wrong. Please try again later.");
       return false;
     }
   };
 
   return (
-    <UserContext.Provider value={{ login, register, toast, user, fetchProfile }}>
+    <UserContext.Provider
+      value={{ login, register, toast, user, fetchProfile }}
+    >
       {children}
     </UserContext.Provider>
   );

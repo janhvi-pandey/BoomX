@@ -28,7 +28,7 @@ const Dashboard = () => {
       {/* Main layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <div className="hidden md:block w-72 bg-white bg-opacity-70 backdrop-blur-md border-r border-pink-400 shadow-md">
+<div className="hidden md:block md:w-72 md:bg-white md:bg-opacity-70 md:backdrop-blur-md md:border-r md:border-pink-400 md:shadow-md">
           <Sidebar />
         </div>
 

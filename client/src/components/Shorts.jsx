@@ -69,7 +69,7 @@ const Shorts = () => {
       className="w-full mx-auto h-screen overflow-y-auto p-4 bg-gradient-to-b from-white via-purple-50 to-white text-black"
     >
       <h1 className="text-4xl font-extrabold mb-2 text-center mt-6 text-[#5c136a]">
-        Quick Flicks, Just for You!
+        Shorts You’ll Love
       </h1>
       <p className="text-center text-sm text-gray-900 mb-9">
         Dive into short-form entertainment curated for your scroll!
@@ -142,7 +142,7 @@ const Shorts = () => {
                 <div className="flex items-center gap-2 text-gray-600 text-sm">
                   <span className="flex items-center gap-1">
                     <BiSolidLike className="text-[#5b5a5a]" />
-                    {video.likes ?? 0}
+                    {video.likes.length ?? 0}
                   </span>
                   <span className="flex items-center gap-1">
                     <FaCommentDots className="text-[#5b5a5a]" />

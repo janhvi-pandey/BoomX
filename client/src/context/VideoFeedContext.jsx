@@ -15,8 +15,8 @@ export const VideoFeedProvider = ({ children }) => {
   const [hasMore, setHasMore] = useState(true);
 
   const fetchFeed = useCallback(async () => {
-    const serverUrl = "http://localhost:5000";
-    // const serverUrl = "https://server-boom-x.vercel.app";
+    // const serverUrl = "http://localhost:5000";
+    const serverUrl = "https://server-boom-x.vercel.app";
 
     if (loading || !hasMore) return;
     setLoading(true);
@@ -30,17 +30,17 @@ export const VideoFeedProvider = ({ children }) => {
         }
       );
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
 
       if (res.ok) {
         setFeed((prev) => [...prev, ...data.feed]);
         if (data.feed.length < 10) setHasMore(false);
         setPage((p) => p + 1);
       } else {
-        console.error(data.message);
+        // console.error(data.message);
       }
     } catch (e) {
-      console.error("Failed to fetch feed", e);
+      // console.error("Failed to fetch feed", e);
     }
 
     setLoading(false);

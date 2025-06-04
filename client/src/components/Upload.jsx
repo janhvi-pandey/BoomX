@@ -76,7 +76,7 @@ const Upload = () => {
       <Toast message={toast.message} type={toast.type} visible={toast.visible} />
       <div className="text-center  lg:ml-4 mt-9 mb-8">
        
-         <h1 className="text-4xl font-extrabold mb-2 mt-6 text-center text-[#5c136a]">
+         <h1 className="text-3xl lg:text-4xl font-extrabold mb-2 mt-6 text-center text-[#5c136a]">
         Upload Your Creation
       </h1>
       <p className="text-center text-sm text-gray-900 mb-9">

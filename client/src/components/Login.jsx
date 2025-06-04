@@ -23,8 +23,7 @@ const FloatingIcon = ({ Icon, style }) => (
 );
 
 const Login = () => {
-  const serverUrl = "http://localhost:5000";
-
+  
   const [form, setForm] = useState({ email: "", password: "" });
   const [toast, setToast] = useState({ message: "", visible: false, type: "" });
 

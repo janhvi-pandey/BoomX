@@ -42,8 +42,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await register(form);
-    // Reset form only if registration succeeded?
-    // Since register navigates on success, no need to reset here.
   };
 
   return (

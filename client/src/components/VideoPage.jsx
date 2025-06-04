@@ -9,6 +9,10 @@ import {
   IoPlayBackCircleSharp,
   IoPauseCircleSharp,
 } from "react-icons/io5";
+
+import { BiSolidLike } from "react-icons/bi";
+import { FaCommentDots } from "react-icons/fa";
+import { IoEye } from "react-icons/io5";
 import Toast from "../reusable/Toast";
 
 const EmbedPlayer = ({ embedUrl, thumbnailUrl, title }) => {
@@ -93,7 +97,14 @@ const getDriveEmbedUrl = (url) => {
 
 const VideoPage = () => {
   const { id } = useParams();
-  const { getVideoById, addComment, purchaseVideo, getWalletBalance,giftVideoCreator } = useVideo();
+  const {
+    getVideoById,
+    addComment,
+    purchaseVideo,
+    getWalletBalance,
+    giftVideoCreator,
+    likeVideo,
+  } = useVideo();
   const videoRef = useRef(null);
   const [video, setVideo] = useState(null);
   const [comments, setComments] = useState([]);
@@ -106,19 +117,25 @@ const VideoPage = () => {
   const [showGiftModal, setShowGiftModal] = useState(false);
   const [giftAmount, setGiftAmount] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
-const [toastMessage, setToastMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
 
+  // const serverUrl = "http://localhost:5000";
+  const serverUrl = "https://server-boom-x.vercel.app";
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetch("http://localhost:5000/api/auth/profile", {
+      fetch(`${serverUrl}/api/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
         .then((data) => {
           if (data?.name) setUser({ name: data.name });
-        })
-        .catch((err) => console.error("Failed to fetch profile:", err));
+        });
+      // .catch((err) => alert("Failed to fetch profile"));
+
+      // .catch((err) => console.error("Failed to fetch profile:", err));
     }
   }, []);
 
@@ -129,7 +146,7 @@ const [toastMessage, setToastMessage] = useState("");
     getVideoById(id)
       .then((data) => {
         if (!data || data.message) {
-          console.error("Failed to fetch video:", data?.message);
+          // console.error("Failed to fetch video:", data?.message);
           setVideo(null);
           setComments([]);
           setPurchased(false);
@@ -140,7 +157,8 @@ const [toastMessage, setToastMessage] = useState("");
         }
       })
       .catch((err) => {
-        console.error("Error loading video:", err);
+        alert("Error loading video");
+        // console.error("Error loading video:", err);
       })
       .finally(() => setLoading(false));
   }, [id, getVideoById]);
@@ -151,7 +169,8 @@ const [toastMessage, setToastMessage] = useState("");
         const balance = await getWalletBalance();
         setWallet(balance);
       } catch (err) {
-        console.error("Failed to fetch wallet:", err);
+        alert("Something went wrong while fetching wallet");
+        // console.error("Failed to fetch wallet:", err);
       }
     };
     fetchWallet();
@@ -176,10 +195,12 @@ const [toastMessage, setToastMessage] = useState("");
         setComments(result.comments);
         setNewComment("");
       } else {
-        console.error("Failed to add comment");
+        alert("Failed to add comment");
+        // console.error("Failed to add comment");
       }
     } catch (error) {
-      console.error("Error adding comment:", error);
+      alert("Something went wrong while adding the comment");
+      // console.error("Error adding comment:", error);
     }
   };
 
@@ -205,7 +226,7 @@ const [toastMessage, setToastMessage] = useState("");
         setError(result.message || "Purchase failed");
       }
     } catch (err) {
-      console.error("Error purchasing video:", err);
+      // console.error("Error purchasing video:", err);
       setError("Purchase failed. Please try again.");
     }
   };
@@ -213,38 +234,72 @@ const [toastMessage, setToastMessage] = useState("");
   useEffect(() => {
     if (purchased && videoRef.current) {
       videoRef.current.play().catch((err) => {
-        console.warn("Auto play prevented:", err);
+        alert("Auto play prevented");
+        // console.warn("Auto play prevented:", err);
       });
     }
   }, [purchased]);
 
- const handleSendGift = async () => {
-  if (!giftAmount || isNaN(giftAmount) || Number(giftAmount) <= 0) {
-    setToastMessage("Please enter a valid amount");
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 1000);
-    return;
-  }
-
-  try {
-    const result = await giftVideoCreator(id, Number(giftAmount));
-    if (result.success) {
-      setToastMessage("Gift set successfully to user");
+  const handleSendGift = async () => {
+    if (!giftAmount || isNaN(giftAmount) || Number(giftAmount) <= 0) {
+      setToastMessage("Please enter a valid amount");
       setToastVisible(true);
-      setGiftAmount("");
-      setShowGiftModal(false);
       setTimeout(() => setToastVisible(false), 1000);
-    } else {
-      setToastMessage(result.message || "Failed to send gift");
+      return;
+    }
+
+    try {
+      const result = await giftVideoCreator(id, Number(giftAmount));
+      if (result.success) {
+        setToastMessage("Gift set successfully to user");
+        setToastVisible(true);
+        setGiftAmount("");
+        setShowGiftModal(false);
+        setTimeout(() => setToastVisible(false), 1000);
+      } else {
+        setToastMessage(result.message || "Failed to send gift");
+        setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 1000);
+      }
+    } catch (error) {
+      setToastMessage("Error sending gift. Please try again.");
       setToastVisible(true);
       setTimeout(() => setToastVisible(false), 1000);
     }
-  } catch (error) {
-    setToastMessage("Error sending gift. Please try again.");
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 1000);
-  }
-};
+  };
+
+  useEffect(() => {
+    if (video?.likes && Array.isArray(video.likes)) {
+      setLikesCount(video.likes.length);
+    } else {
+      setLikesCount(0);
+    }
+  }, [video]);
+  const handleLike = async () => {
+    if (likeLoading) return;
+
+    setLikeLoading(true);
+    try {
+      const result = await likeVideo(id);
+
+      if (result.likes && Array.isArray(result.likes)) {
+        setLikesCount(result.likes.length);
+        // Also update the video.likes array locally for consistency
+        setVideo((prev) => ({ ...prev, likes: result.likes }));
+      } else if (typeof result.likesCount === "number") {
+        setLikesCount(result.likesCount);
+      } else {
+        alert("Invalid likes data received");
+        // console.error("Invalid likes data received");
+      }
+    } catch (error) {
+      alert("Error liking video");
+      // console.error("Error liking video:", error);
+    } finally {
+      setLikeLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto p-6">
@@ -325,7 +380,7 @@ const [toastMessage, setToastMessage] = useState("");
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen ">
       <div className="hidden lg:block w-64">
         <Sidebar />
       </div>
@@ -335,19 +390,20 @@ const [toastMessage, setToastMessage] = useState("");
       </div>
 
       <main className="flex-1 p-6 space-y-6">
-        <h1 className="text-4xl font-extrabold mb-2 mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
+        <h1 className="lg:text-4xl text-3xl font-extrabold lg:mb-4 mt-6 text-start lg:text-center text-[#5c136a]">
           Boom Video: {video.title}
         </h1>
 
-        <div className="flex justify-between items-center mb-10">
-          <p className="text-lg font-medium text-gray-700">
+        {/* New row with author and gift button */}
+        <div className="flex flex-col lg:flex-row lg:justify-between">
+          <p className="text-center text-bold text-sm lg:text-lg text-gray-900 mb-4 lg:mb-1">
             Get ready to dive in — turn up the volume, enjoy the ride & let us
             know what you think!
           </p>
 
           <button
             onClick={() => setShowGiftModal(true)}
-            className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition font-semibold shadow"
+            className=" text-white p-2 rounded bg-[#a93f5d] hover:bg-[#983451] transition font-semibold shadow"
           >
             Gift Creator
           </button>
@@ -399,9 +455,48 @@ const [toastMessage, setToastMessage] = useState("");
             </button>
           </div>
         )}
+
         <Toast message={toastMessage} visible={toastVisible} />
+        {/* Likes section  */}
+        <div className="flex justify-between items-center  mb-8 py-3">
+          <p className="text-gray-800 font-semibold">
+            Author:{" "}
+            <span className="text-[#5c136a]">
+              {video.creatorName || "Unknown Creator"}
+            </span>
+          </p>
 
+          <div className="flex items-center gap-6 text-gray-700 text-sm select-none">
+            <button
+              onClick={handleLike}
+              disabled={likeLoading}
+              className={`flex items-center gap-1 ${
+                likeLoading
+                  ? "cursor-not-allowed opacity-60"
+                  : "hover:text-pink-600"
+              } transition`}
+              aria-label="Like video"
+              title="Like this video"
+            >
+              <BiSolidLike
+                className={`text-xl ${
+                  likeLoading ? "text-[#a93f5d] " : "text-[#5b5a5a]"
+                }`}
+              />
+              <span>{likesCount}</span>
+            </button>
 
+            <div className="flex items-center gap-1" title="Comments">
+              <FaCommentDots className="text-xl" />
+              <span>{video.comments?.length ?? 0}</span>
+            </div>
+
+            <div className="flex items-center gap-1" title="Views">
+              <IoEye className="text-xl" />
+              <span>{video.views ?? 0}</span>
+            </div>
+          </div>
+        </div>
         {/* Comments Section */}
         <section>
           <h2 className="text-2xl font-semibold mb-4 mt-8 text-gray-900">
@@ -414,11 +509,11 @@ const [toastMessage, setToastMessage] = useState("");
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
-              className="flex-grow border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500"
+              className="flex-grow border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#89355f]"
             />
             <button
               type="submit"
-              className="bg-pink-600 text-white px-5 py-2 rounded-lg hover:bg-pink-700 transition font-medium shadow"
+              className=" text-white px-5 py-2 rounded-lg bg-[#a93f5d] hover:bg-[#983451] transition font-medium shadow"
             >
               Post
             </button>
@@ -429,21 +524,55 @@ const [toastMessage, setToastMessage] = useState("");
               No comments yet. Be the first!
             </p>
           ) : (
-            <ul className="space-y-3 max-h-80 overflow-y-auto pr-2">
-              {comments.map((comment) => (
-                <li
-                  key={comment._id}
-                  className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm"
-                >
-                  <div className="text-sm text-gray-500 mb-1">
-                    <span className="font-medium text-gray-700">
-                      {comment.username || "Anonymous"}
-                    </span>{" "}
-                    • {new Date(comment.createdAt).toLocaleString()}
-                  </div>
-                  <div className="text-gray-800 text-sm">{comment.content}</div>
-                </li>
-              ))}
+            <ul className="space-y-5 max-h-80 overflow-y-auto pr-2">
+              {comments.map((comment) => {
+                const createdAt = new Date(comment.createdAt);
+                const date = createdAt.toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                });
+                const time = createdAt.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                return (
+                  <li
+                    key={comment._id}
+                    className="flex gap-3 items-start border border-gray-200 rounded-md p-3 bg-white shadow-sm"
+                  >
+                    {/* Small Avatar */}
+                    {comment.avatarUrl ? (
+                      <img
+                        src={comment.avatarUrl}
+                        alt={`${comment.username || "User"} avatar`}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-[#89355f] text-white flex items-center justify-center text-sm font-semibold uppercase">
+                        {comment.username?.charAt(0) || "A"}
+                      </div>
+                    )}
+
+                    {/* Comment Details */}
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center mb-0.5">
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {comment.username || "Anonymous"}
+                          </p>
+                          <p className="text-xs text-gray-400">{date}</p>
+                        </div>
+                        <p className="text-xs text-gray-400">{time}</p>
+                      </div>
+                      <p className="mt-1 text-gray-800 text-sm leading-relaxed">
+                        {comment.content}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

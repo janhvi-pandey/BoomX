@@ -3,8 +3,8 @@ import { createContext, useContext } from "react";
 const VideoContext = createContext(null);
 
 export const VideoProvider = ({ children }) => {
-  const serverUrl = "http://localhost:5000";
-  // const serverUrl = "https://server-boom-x.vercel.app";
+  // const serverUrl = "http://localhost:5000";
+  const serverUrl = "https://server-boom-x.vercel.app";
 
   const uploadVideo = async (videoData) => {
     try {
@@ -25,7 +25,8 @@ export const VideoProvider = ({ children }) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error uploading video:", error);
+      alert("Failed to upload video");
+      // console.error("Error uploading video:", error);
       throw error;
     }
   };
@@ -50,7 +51,8 @@ export const VideoProvider = ({ children }) => {
       // console.log(data);
       return data;
     } catch (error) {
-      console.error("Error fetching video:", error);
+      alert("Failed to fetch profile");
+      // console.error("Error fetching video:", error);
       throw error;
     }
   };
@@ -80,7 +82,7 @@ export const VideoProvider = ({ children }) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error adding comment:", error);
+      // console.error("Error adding comment:", error);
       throw error;
     }
   };
@@ -106,7 +108,7 @@ export const VideoProvider = ({ children }) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error purchasing video:", error);
+      // console.error("Error purchasing video:", error);
       throw error;
     }
   };
@@ -130,7 +132,7 @@ export const VideoProvider = ({ children }) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error fetching wallet balance:", error);
+      // console.error("Error fetching wallet balance:", error);
       throw error;
     }
   };
@@ -155,10 +157,36 @@ export const VideoProvider = ({ children }) => {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error gifting video creator:", error);
+      // console.error("Error gifting video creator:", error);
       throw error;
     }
   };
+
+  const likeVideo = async (videoId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch(`${serverUrl}/api/videos/${videoId}/like`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Like failed: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    // console.log(data)
+    return data;
+  } catch (error) {
+    alert("Error liking/unliking video");
+    // console.error("Error liking/unliking video:", error);
+    throw error;
+  }
+};
+
 
   return (
     <VideoContext.Provider
@@ -169,6 +197,7 @@ export const VideoProvider = ({ children }) => {
         purchaseVideo,
         getWalletBalance,
         giftVideoCreator,
+         likeVideo,
       }}
     >
       {children}
