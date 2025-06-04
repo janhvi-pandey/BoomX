@@ -127,7 +127,7 @@ router.post("/:id/comments", verifyToken, async (req, res) => {
 
     res.status(201).json({ message: "Comment added", comments: video.comments });
   } catch (error) {
-    console.error("Add comment error:", error);
+    // console.error("Add comment error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -161,7 +161,7 @@ router.post("/:videoId/like", verifyToken, async (req, res) => {
       })),
     });
   } catch (err) {
-    console.error("Like route error:", err);
+    // console.error("Like route error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -251,7 +251,7 @@ router.post("/gift/:videoId", verifyToken, async (req, res) => {
       creatorBalance: video.creator.wallet,
     });
   } catch (err) {
-    console.error("Gift error:", err);
+    // console.error("Gift error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });

@@ -60,7 +60,7 @@ router.post("/login", async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email },
     });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -69,6 +69,7 @@ router.post("/login", async (req, res) => {
 // Get profile
 router.get('/profile', verifyToken, async (req, res) => {
   const user = await User.findById(req.user.id).select('-password');
+  // console.log(user);
   res.json(user);
 });
 
@@ -82,7 +83,7 @@ router.get("/wallet/balance", verifyToken, async (req, res) => {
     }
     res.status(200).json({ balance: user.wallet });
   } catch (err) {
-    console.error("Wallet balance error:", err);
+    // console.error("Wallet balance error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

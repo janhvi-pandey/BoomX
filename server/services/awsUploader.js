@@ -32,7 +32,7 @@ const uploadToS3 = async (filePath, type) => {
     const fileUrl = `https://${process.env.AWS_BUCKET_NAME_BOOMX}.s3.${process.env.AWS_REGION_BOOMX}.amazonaws.com/${uniqueFileName}`;
     return { Location: fileUrl };
   } catch (err) {
-    console.error("S3 upload error:", err);
+    // console.error("S3 upload error:", err);
     throw err;
   }
 };

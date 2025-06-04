@@ -59,7 +59,7 @@ router.get("/videos", verifyToken, async (req, res) => {
 
     res.status(200).json({ success: true, feed });
   } catch (err) {
-    console.error("Feed Error:", err);
+    // console.error("Feed Error:", err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
