@@ -74,14 +74,17 @@ const Upload = () => {
   return (
     <>
       <Toast message={toast.message} type={toast.type} visible={toast.visible} />
-      <div className="text-center lg:text-start lg:ml-4 mt-9 mb-8">
-        <h1 className="text-4xl font-extrabold mb-2 mt-4 lg:mt-9 bg-clip-text text-transparent bg-gradient-to-r from-pink-600 to-[#5c136a]">
-          Upload Your Creation
-        </h1>
-        <p className="text-lg font-medium text-gray-700 mt-1">
-          Share your stories, shorts, or full-length features with the BoomX community.
-        </p>
+      <div className="text-center  lg:ml-4 mt-9 mb-8">
+       
+         <h1 className="text-4xl font-extrabold mb-2 mt-6 text-center text-[#5c136a]">
+        Upload Your Creation
+      </h1>
+      <p className="text-center text-sm text-gray-900 mb-9">
+      Share your stories, shorts, or full-length features with the BoomX community.
+      </p>
+
       </div>
+
      <div className="w-full flex items-center justify-center px-4">
       <div className="w-full max-w-lg bg-white/70 backdrop-blur-lg shadow-xl rounded-xl lg:p-4 p-5 text-gray-700 border border-black">
         

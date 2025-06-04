@@ -40,16 +40,16 @@ const Feed = () => {
       ref={containerRef}
       className="w-full mx-auto h-screen overflow-y-auto p-4 bg-gradient-to-b from-white via-purple-50 to-white text-black"
     >
-      <h1 className="text-4xl font-extrabold mb-2 text-center text-[#5c136a]">
+      <h1 className="text-4xl font-extrabold mb-2 text-center mt-6 text-[#5c136a]">
         Boom Video Feed
       </h1>
-      <p className="text-center text-sm text-gray-600 mb-6">
+      <p className="text-center text-sm text-gray-900 mb-9">
         Your daily dose of entertaining, insightful, and trending videos!
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1  lg:grid-cols-3 gap-7 gap-y-10">
         {uniqueFeed.length === 0 && !loading && (
-          <p className="text-center col-span-full">No videos available.</p>
+          <p className="text-center col-span-full">No videos available...</p>
         )}
 
         {uniqueFeed.map((video) => (
